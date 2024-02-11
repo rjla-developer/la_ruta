@@ -18,14 +18,14 @@ class Home extends StatelessWidget {
       options: const MapOptions(
         initialCenter: myPosition,
         initialZoom: 19.5,
+        maxZoom: 22,
       ),
       children: [
         TileLayer(
           urlTemplate:
-              "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=$mapboxAccessToken",
+              "https://api.mapbox.com/styles/v1/rj-developer/clsgye3i303gv01o88gzf40sf/tiles/256/{z}/{x}/{y}@2x?access_token=$mapboxAccessToken",
           additionalOptions: const {
             'accessToken': mapboxAccessToken,
-            'id': 'mapbox/streets-v11',
           },
         ),
       ],
