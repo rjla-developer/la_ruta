@@ -14,19 +14,46 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlutterMap(
-      options: const MapOptions(
-        initialCenter: myPosition,
-        initialZoom: 19.5,
-        maxZoom: 22,
-      ),
-      children: [
-        TileLayer(
-          urlTemplate:
-              "https://api.mapbox.com/styles/v1/rj-developer/clsgye3i303gv01o88gzf40sf/tiles/256/{z}/{x}/{y}@2x?access_token=$mapboxAccessToken",
-          additionalOptions: const {
-            'accessToken': mapboxAccessToken,
-          },
+    return Stack(
+      children: <Widget>[
+        FlutterMap(
+          options: const MapOptions(
+            initialCenter: myPosition,
+            initialZoom: 19.5,
+            maxZoom: 22,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate:
+                  "https://api.mapbox.com/styles/v1/rj-developer/clsgye3i303gv01o88gzf40sf/tiles/256/{z}/{x}/{y}@2x?access_token=$mapboxAccessToken",
+              additionalOptions: const {
+                'accessToken': mapboxAccessToken,
+              },
+            ),
+          ],
+        ),
+        Positioned(
+          top: 100,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: SizedBox(
+              width: 350,
+              height: 50,
+              child: Material(
+                elevation: 8.0,
+                borderRadius: BorderRadius.circular(30.0),
+                child: TextField(
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );
