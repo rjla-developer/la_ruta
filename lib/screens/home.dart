@@ -39,12 +39,12 @@ class Home extends StatelessWidget {
           child: Center(
             child: SizedBox(
               width: 350,
-              height: 50,
               child: Material(
                 elevation: 8.0,
                 borderRadius: BorderRadius.circular(30.0),
                 child: TextField(
                   decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
