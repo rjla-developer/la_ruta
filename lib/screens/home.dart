@@ -7,7 +7,7 @@ import 'package:latlong2/latlong.dart';
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
-const myPosition = LatLng(18.9216, -99.2347);
+const myPosition = LatLng(18.9213, -99.2347);
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -19,7 +19,7 @@ class Home extends StatelessWidget {
         FlutterMap(
           options: const MapOptions(
             initialCenter: myPosition,
-            initialZoom: 19.5,
+            initialZoom: 18.5,
             maxZoom: 22,
           ),
           children: [
@@ -29,6 +29,38 @@ class Home extends StatelessWidget {
               additionalOptions: const {
                 'accessToken': mapboxAccessToken,
               },
+            ),
+            const MarkerLayer(
+              markers: [
+                Marker(
+                  point: myPosition,
+                  child: Icon(
+                    Icons.person_pin,
+                    size: 50.0,
+                    color: Color.fromARGB(255, 25, 176, 218),
+                  ),
+                ),
+                Marker(
+                  point: LatLng(18.9225, -99.23479),
+                  child: Icon(
+                    Icons.directions_bus,
+                    size: 50.0,
+                    color: Color.fromARGB(255, 26, 180, 54),
+                  ),
+                ),
+              ],
+            ),
+            PolylineLayer(
+              polylines: [
+                Polyline(
+                  points: [
+                    myPosition,
+                    const LatLng(18.9216, -99.23367),
+                    const LatLng(18.9225, -99.23479),
+                  ],
+                  color: Colors.blue,
+                ),
+              ],
             ),
           ],
         ),
