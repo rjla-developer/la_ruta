@@ -9,7 +9,9 @@ import 'dart:convert';
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
-const myPosition = LatLng(18.9213, -99.2347);
+/* const myPosition = LatLng(18.9213, -99.2347); */
+
+const myPosition = LatLng(18.788, -99.298);
 const intermediatePosition = LatLng(18.9225, -99.23479);
 const intermediatePosition2 = LatLng(18.9300, -99.23479);
 const destinationPosition = LatLng(18.92330, -99.23580);
@@ -24,6 +26,10 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<LatLng> routePoints = [];
 
+  String getCoords() {
+    return "${myPosition.longitude},${myPosition.latitude};${intermediatePosition.longitude},${intermediatePosition.latitude};${intermediatePosition2.longitude},${intermediatePosition2.latitude};${destinationPosition.longitude},${destinationPosition.latitude}";
+  }
+
   @override
   void initState() {
     super.initState();
@@ -32,7 +38,7 @@ class _HomeState extends State<Home> {
 
   Future<void> fetchRoute() async {
     final response = await http.get(Uri.parse(
-        'https://api.mapbox.com/directions/v5/mapbox/driving/${myPosition.longitude},${myPosition.latitude};${intermediatePosition.longitude},${intermediatePosition.latitude};${intermediatePosition2.longitude},${intermediatePosition2.latitude};${destinationPosition.longitude},${destinationPosition.latitude}?geometries=geojson&access_token=$mapboxAccessToken'));
+        'https://api.mapbox.com/directions/v5/mapbox/driving/${getCoords()}?geometries=geojson&access_token=$mapboxAccessToken'));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final geometry = data['routes'][0]['geometry']['coordinates'];
@@ -53,7 +59,7 @@ class _HomeState extends State<Home> {
         FlutterMap(
           options: const MapOptions(
             initialCenter: myPosition,
-            initialZoom: 17.5,
+            initialZoom: 10.5,
             maxZoom: 22,
           ),
           children: [
