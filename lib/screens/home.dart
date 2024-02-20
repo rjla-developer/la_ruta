@@ -3,25 +3,14 @@ import 'package:flutter_map/flutter_map.dart';
 
 //Latlong2:
 import 'package:latlong2/latlong.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
+//Functions:
+import 'package:la_ruta/utils/get_routes.dart';
 
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
 const myPosition = LatLng(18.788646, -99.242968);
-
-const route = [
-  LatLng(18.788646, -99.242968), //El Cuexcomate
-  LatLng(18.879278, -99.229466), //Carpintería Alvarez III
-  LatLng(18.977502, -99.253349), //Barbacoa Doña Natalia
-  LatLng(18.974735, -99.262000), //Ruta 3 base Santa Maria
-  LatLng(18.940714, -99.241622), //Tortilleria Rayito
-  LatLng(18.928857, -99.238352), //Puesto de periodicos de La Union de Morelos
-  LatLng(18.908121, -99.232297), //Registro Agrario Nacional Morelos
-  LatLng(18.844531, -99.223947), //Don Cacahuate
-  LatLng(18.788646, -99.242968), //El Cuexcomate
-];
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -36,28 +25,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-  }
-
-  String getCoords() {
-    return route
-        .map((waypoint) => '${waypoint.longitude},${waypoint.latitude}')
-        .join(';');
-  }
-
-  Future<void> getRoute() async {
-    final response = await http.get(Uri.parse(
-        'https://api.mapbox.com/directions/v5/mapbox/driving/${getCoords()}?geometries=geojson&access_token=$mapboxAccessToken'));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final geometry = data['routes'][0]['geometry']['coordinates'];
-      final List<LatLng> points =
-          geometry.map<LatLng>((coord) => LatLng(coord[1], coord[0])).toList();
-      setState(() {
-        routePoints = points;
-      });
-    } else {
-      throw Exception('Failed to load route');
-    }
   }
 
   @override
@@ -140,7 +107,13 @@ class _HomeState extends State<Home> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  var result =
+                      await getRoute("Santa María - Buena vista - Calera");
+                  setState(() {
+                    routePoints = result;
+                  });
+                },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     vertical: 15.0,
@@ -158,7 +131,13 @@ class _HomeState extends State<Home> {
               ),
               const SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  var result = await getRoute(
+                      "Santa María - Buena vista - Francisco Villa");
+                  setState(() {
+                    routePoints = result;
+                  });
+                },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     vertical: 15.0,
