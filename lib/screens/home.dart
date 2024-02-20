@@ -9,12 +9,19 @@ import 'dart:convert';
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
-/* const myPosition = LatLng(18.9213, -99.2347); */
+const myPosition = LatLng(18.788646, -99.242968);
 
-const myPosition = LatLng(18.788, -99.298);
-const intermediatePosition = LatLng(18.9225, -99.23479);
-const intermediatePosition2 = LatLng(18.9300, -99.23479);
-const destinationPosition = LatLng(18.92330, -99.23580);
+const route = [
+  LatLng(18.788646, -99.242968), //El Cuexcomate
+  LatLng(18.879278, -99.229466), //Carpintería Alvarez III
+  LatLng(18.977502, -99.253349), //Barbacoa Doña Natalia
+  LatLng(18.974735, -99.262000), //Ruta 3 base Santa Maria
+  LatLng(18.940714, -99.241622), //Tortilleria Rayito
+  LatLng(18.928857, -99.238352), //Puesto de periodicos de La Union de Morelos
+  LatLng(18.908121, -99.232297), //Registro Agrario Nacional Morelos
+  LatLng(18.844531, -99.223947), //Don Cacahuate
+  LatLng(18.788646, -99.242968), //El Cuexcomate
+];
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -26,17 +33,18 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<LatLng> routePoints = [];
 
-  String getCoords() {
-    return "${myPosition.longitude},${myPosition.latitude};${intermediatePosition.longitude},${intermediatePosition.latitude};${intermediatePosition2.longitude},${intermediatePosition2.latitude};${destinationPosition.longitude},${destinationPosition.latitude}";
-  }
-
   @override
   void initState() {
     super.initState();
-    fetchRoute();
   }
 
-  Future<void> fetchRoute() async {
+  String getCoords() {
+    return route
+        .map((waypoint) => '${waypoint.longitude},${waypoint.latitude}')
+        .join(';');
+  }
+
+  Future<void> getRoute() async {
     final response = await http.get(Uri.parse(
         'https://api.mapbox.com/directions/v5/mapbox/driving/${getCoords()}?geometries=geojson&access_token=$mapboxAccessToken'));
     if (response.statusCode == 200) {
@@ -75,22 +83,22 @@ class _HomeState extends State<Home> {
                 Polyline(
                   strokeWidth: 4.0,
                   points: routePoints,
-                  color: Colors.blue,
+                  color: Colors.green,
                 ),
               ],
             ),
             const MarkerLayer(
               markers: [
-                Marker(
+                /* Marker(
                   point: myPosition,
                   child: Icon(
                     Icons.person_pin,
                     size: 50.0,
                     color: Color.fromARGB(255, 25, 176, 218),
                   ),
-                ),
+                ), */
                 Marker(
-                  point: LatLng(18.92330, -99.23580),
+                  point: LatLng(18.940714, -99.241622),
                   child: Icon(
                     Icons.directions_bus,
                     size: 50.0,
@@ -122,6 +130,51 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ),
+          ),
+        ),
+        Positioned(
+          bottom: 60,
+          left: 50,
+          right: 50,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15.0,
+                    horizontal: 15.0,
+                  ),
+                ),
+                child: const Text(
+                  'Santa María - Buena vista - Calera',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15.0,
+                    horizontal: 15.0,
+                  ),
+                ),
+                child: const Text(
+                  'Santa María - Buena vista - Francisco Villa',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
         ),
       ],
