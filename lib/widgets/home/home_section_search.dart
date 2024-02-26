@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/services.dart';
 
 //Http:
@@ -21,6 +22,7 @@ class HomeSectionSearch extends StatefulWidget {
 class _HomeSectionSearchState extends State<HomeSectionSearch> {
   var showModalSearch = false;
   var responseLocations = [];
+  Timer? _debounce;
 
   Future<void> getSearches() async {
     String inputValue = widget.controllerResponseInputSearch.text;
@@ -71,7 +73,6 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                                 setState(() {
                                   widget.controllerResponseInputSearch.text =
                                       responseLocations[i]['name'];
-                                  /*  print(responseLocations[i]); */
                                 });
                               },
                               style: TextButton.styleFrom(
@@ -155,15 +156,17 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
               borderRadius: BorderRadius.circular(30.0),
               child: TextField(
                 controller: widget.controllerResponseInputSearch,
-                onChanged: (value) => {
-                  if (widget.controllerResponseInputSearch.text.isEmpty)
-                    {
+                onChanged: (value) {
+                  if (_debounce?.isActive ?? false) _debounce?.cancel();
+                  _debounce = Timer(const Duration(milliseconds: 200), () {
+                    if (widget.controllerResponseInputSearch.text.isEmpty) {
                       setState(() {
                         responseLocations = [];
-                      })
+                      });
+                    } else {
+                      getSearches();
                     }
-                  else
-                    {getSearches()}
+                  });
                 },
                 onTap: () {
                   setState(() {
@@ -179,8 +182,12 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                   hintText: "A dónde quieres ir?",
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.clear),
-                    onPressed: () =>
-                        {widget.controllerResponseInputSearch.clear()},
+                    onPressed: () => {
+                      widget.controllerResponseInputSearch.clear(),
+                      setState(() {
+                        responseLocations = [];
+                      })
+                    },
                   ),
                 ),
               ),
