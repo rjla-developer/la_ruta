@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 
+//Http:
+import 'package:http/http.dart' as http;
+
+const searchLocationAccessToken =
+    "pk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsa3JpOXNudDB2dG8zcXFtN3RqYzk2ZngifQ.OjfZuB4ku290h-qvB-BecA";
+
 class HomeSectionSearch extends StatefulWidget {
   final TextEditingController controllerResponseInputSearch;
 
@@ -17,8 +23,9 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
   var responseLocations = [];
 
   Future<void> getSearches() async {
-    /* var url = Uri.https('api.mapbox.com', '/search/searchbox/v1/suggest', {
-      'q': responseInputSearch,
+    String inputValue = widget.controllerResponseInputSearch.text;
+    var url = Uri.https('api.mapbox.com', '/search/searchbox/v1/suggest', {
+      'q': inputValue,
       'language': 'es',
       'country': 'mx',
       'proximity': '-99.23426591658529, 18.921791278067488',
@@ -26,17 +33,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
       'access_token': searchLocationAccessToken
     });
     var response = await http.get(url);
-    print(response.body);
-    setState(() {
-      responseLocations = locationsFromJson(response.body);
-    }); */
-
-    String jsonString =
-        await rootBundle.loadString('assets/jsons/search-places.json');
-
-    Map<String, dynamic> jsonData = jsonDecode(jsonString);
-
-    /* print(jsonData['suggestions'][0]['name']); */
+    Map<String, dynamic> jsonData = jsonDecode(response.body);
     setState(() {
       responseLocations = jsonData['suggestions'];
     });
@@ -158,7 +155,16 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
               borderRadius: BorderRadius.circular(30.0),
               child: TextField(
                 controller: widget.controllerResponseInputSearch,
-                onChanged: (value) => {getSearches()},
+                onChanged: (value) => {
+                  if (widget.controllerResponseInputSearch.text.isEmpty)
+                    {
+                      setState(() {
+                        responseLocations = [];
+                      })
+                    }
+                  else
+                    {getSearches()}
+                },
                 onTap: () {
                   setState(() {
                     showModalSearch = true;

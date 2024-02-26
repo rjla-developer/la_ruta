@@ -7,9 +7,6 @@ import 'package:la_ruta/widgets/home/home_section_search.dart';
 //Latlong2:
 import 'package:latlong2/latlong.dart';
 
-const searchLocationAccessToken =
-    "pk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsa3JpOXNudDB2dG8zcXFtN3RqYzk2ZngifQ.OjfZuB4ku290h-qvB-BecA";
-
 class Home extends StatefulWidget {
   const Home({super.key});
 
