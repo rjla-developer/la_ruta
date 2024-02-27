@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 //Widgets:
 import 'package:la_ruta/widgets/home/home-section-map/home_section_map.dart';
@@ -6,6 +8,12 @@ import 'package:la_ruta/widgets/home/home_section_search.dart';
 
 //Latlong2:
 import 'package:latlong2/latlong.dart';
+
+//Functions:
+import 'package:la_ruta/utils/get_routes.dart';
+
+const mapboxAccessToken =
+    "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -18,6 +26,22 @@ class _HomeState extends State<Home> {
   List<LatLng> routePoints = [];
   final controllerResponseInputSearch = TextEditingController();
 
+  Future<void> getRoute(String busName) async {
+    final response = await http.get(Uri.parse(
+        'https://api.mapbox.com/directions/v5/mapbox/driving/${getCoords(busName)}?geometries=geojson&access_token=$mapboxAccessToken'));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final geometry = data['routes'][0]['geometry']['coordinates'];
+      final List<LatLng> points =
+          geometry.map<LatLng>((coord) => LatLng(coord[1], coord[0])).toList();
+      setState(() {
+        routePoints = points;
+      });
+    } else {
+      throw Exception('Failed to load route');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -25,7 +49,7 @@ class _HomeState extends State<Home> {
         HomeSectionMap(routePoints: routePoints),
         HomeSectionSearch(
             controllerResponseInputSearch: controllerResponseInputSearch),
-        /* Positioned(
+        Positioned(
           bottom: 60,
           left: 50,
           right: 50,
@@ -34,11 +58,7 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               ElevatedButton(
                 onPressed: () async {
-                  var result =
-                      await getRoute("Santa María - Buena vista - Calera");
-                  setState(() {
-                    routePoints = result;
-                  });
+                  await getRoute("Santa María - Buena vista - Calera");
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
@@ -58,11 +78,7 @@ class _HomeState extends State<Home> {
               const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await getRoute(
-                      "Santa María - Buena vista - Francisco Villa");
-                  setState(() {
-                    routePoints = result;
-                  });
+                  await getRoute("Santa María - Buena vista - Francisco Villa");
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
@@ -81,7 +97,7 @@ class _HomeState extends State<Home> {
               ),
             ],
           ),
-        ), */
+        ),
       ],
     );
   }
