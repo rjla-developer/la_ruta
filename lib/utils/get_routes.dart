@@ -7,9 +7,9 @@ const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
 String getCoords(busName) {
-  var route;
+  var _route;
   if (busName == "Santa María - Buena vista - Francisco Villa") {
-    route = [
+    _route = [
       const LatLng(18.786022, -99.247230), //"La Cascada" Jardín
       /* const LatLng(18.873114, -99.226615), //Huesero
       const LatLng(18.925176, -99.238123), //Bodega Aurrera
@@ -22,7 +22,7 @@ String getCoords(busName) {
       const LatLng(18.786022, -99.247230), //"La Cascada" Jardín */
     ];
   } else if (busName == "Santa María - Buena vista - Calera") {
-    route = [
+    _route = [
       const LatLng(18.788646, -99.242968), //El Cuexcomate
       /* const LatLng(18.879278, -99.229466), //Carpintería Alvarez III
       const LatLng(18.977502, -99.253349), //Barbacoa Doña Natalia */
@@ -35,12 +35,12 @@ String getCoords(busName) {
       const LatLng(18.788646, -99.242968), //El Cuexcomate */
     ];
   }
-  return route
+  return _route
       .map((waypoint) => '${waypoint.longitude},${waypoint.latitude}')
       .join(';');
 }
 
-Future<List<LatLng>> getRoute(busName) async {
+Future<List<LatLng>> getRoute(String busName) async {
   final response = await http.get(Uri.parse(
       'https://api.mapbox.com/directions/v5/mapbox/driving/${getCoords(busName)}?geometries=geojson&access_token=$mapboxAccessToken'));
   if (response.statusCode == 200) {
@@ -50,6 +50,6 @@ Future<List<LatLng>> getRoute(busName) async {
         geometry.map<LatLng>((coord) => LatLng(coord[1], coord[0])).toList();
     return points;
   } else {
-    throw Exception('Failed to load route');
+    throw Exception('Failed to load _route');
   }
 }
