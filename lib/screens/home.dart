@@ -10,6 +10,12 @@ import 'package:latlong2/latlong.dart';
 //Functions:
 /* import 'package:la_ruta/utils/get_routes.dart'; */
 
+//FlutterMapAnimations:
+import 'package:flutter_map_animations/flutter_map_animations.dart';
+
+//FlutterMap:
+import 'package:flutter_map/flutter_map.dart';
+
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
@@ -20,8 +26,12 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with TickerProviderStateMixin {
   LatLng? targetPosition;
+  late final animatedMapController = AnimatedMapController(vsync: this);
+  bool useTransformer = true;
+  static const useTransformerId = 'useTransformerId';
+  final markers = ValueNotifier<List<AnimatedMarker>>([]);
 
   void setTargetPosition(LatLng position) {
     setState(() {
@@ -30,10 +40,19 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void dispose() {
+    markers.dispose();
+    animatedMapController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        HomeSectionMap(targetPosition: targetPosition),
+        HomeSectionMap(
+            targetPosition: targetPosition,
+            animatedMapController: animatedMapController),
         HomeSectionSearch(setTargetPosition: setTargetPosition),
         /* Positioned(
           bottom: 60,
@@ -92,6 +111,17 @@ class _HomeState extends State<Home> {
             ],
           ),
         ), */
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton(
+            onPressed: () => animatedMapController.animatedZoomOut(
+              customId: useTransformer ? useTransformerId : null,
+            ),
+            tooltip: 'Zoom out',
+            child: const Icon(Icons.zoom_out),
+          ),
+        ),
       ],
     );
   }

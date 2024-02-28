@@ -9,12 +9,19 @@ import 'package:latlong2/latlong.dart';
 //Geolocator:
 import 'package:geolocator/geolocator.dart';
 
+//FlutterMapAnimations:
+import 'package:flutter_map_animations/flutter_map_animations.dart';
+
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
 class HomeSectionMap extends StatefulWidget {
   final LatLng? targetPosition;
-  const HomeSectionMap({Key? key, required this.targetPosition})
+  final AnimatedMapController animatedMapController;
+  const HomeSectionMap(
+      {Key? key,
+      required this.targetPosition,
+      required this.animatedMapController})
       : super(key: key);
 
   @override
@@ -64,10 +71,12 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
   Widget build(BuildContext context) {
     return userPosition != null
         ? FlutterMap(
+            mapController: widget.animatedMapController.mapController,
             options: MapOptions(
               initialCenter: userPosition!,
               initialZoom: 17,
               maxZoom: 22,
+              minZoom: 9.5,
             ),
             children: [
               TileLayer(
@@ -76,6 +85,44 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                 additionalOptions: const {
                   'accessToken': mapboxAccessToken,
                 },
+              ),
+              AnimatedMarkerLayer(
+                markers: [
+                  AnimatedMarker(
+                    point: userPosition!,
+                    builder: (_, animation) {
+                      final size = 50.0 * animation.value;
+                      return Icon(
+                        Icons.person_pin,
+                        size: size,
+                        color: const Color.fromARGB(255, 25, 176, 218),
+                      );
+                    },
+                  ),
+                  if (widget.targetPosition != null)
+                    AnimatedMarker(
+                      point: widget.targetPosition!,
+                      builder: (_, animation) {
+                        final size = 50.0 * animation.value;
+                        return Icon(
+                          Icons.location_pin,
+                          size: size,
+                          color: const Color.fromARGB(255, 170, 39, 39),
+                        );
+                      },
+                    ),
+                  AnimatedMarker(
+                    point: const LatLng(18.940714, -99.241622),
+                    builder: (_, animation) {
+                      final size = 50.0 * animation.value;
+                      return Icon(
+                        Icons.directions_bus,
+                        size: size,
+                        color: const Color.fromARGB(255, 189, 39, 194),
+                      );
+                    },
+                  ),
+                ],
               ),
               /* PolylineLayer(
                 polylines: [
@@ -86,7 +133,7 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                   ),
                 ],
               ), */
-              MarkerLayer(
+              /* MarkerLayer(
                 markers: [
                   Marker(
                     point: userPosition!,
@@ -105,16 +152,16 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                         color: Color.fromARGB(255, 170, 39, 39),
                       ),
                     ),
-                  /* const Marker(
+                  const Marker(
                     point: LatLng(18.940714, -99.241622),
                     child: Icon(
                       Icons.directions_bus,
                       size: 50.0,
                       color: Color.fromARGB(255, 189, 39, 194),
                     ),
-                  ), */
+                  ),
                 ],
-              ),
+              ), */
             ],
           )
         : const Center(child: CircularProgressIndicator());

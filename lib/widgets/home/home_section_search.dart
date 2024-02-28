@@ -45,8 +45,6 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
   }
 
   Future<void> getCoordinates(locationId) async {
-    /*pk.eyJ1Ijoic2VhcmNoLW1hY2hpbmUtdXNlci0xIiwiYSI6ImNrNnJ6bDdzdzA5cnAza3F4aTVwcWxqdWEifQ.RFF7CVFKrUsZVrJsFzhRvQ*/
-    /* &session_token=f4534cfc-5085-4605-bbd0-a77f1549d3ce */
     var url = Uri.https(
         'api.mapbox.com', '/search/searchbox/v1/retrieve/$locationId', {
       'access_token': searchLocationAccessToken,
