@@ -13,8 +13,9 @@ const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
 class HomeSectionMap extends StatefulWidget {
-  final List<LatLng> routePoints;
-  const HomeSectionMap({Key? key, required this.routePoints}) : super(key: key);
+  /* final List<LatLng> routePoints; */
+  const HomeSectionMap({Key? key /* ,required this.routePoints */})
+      : super(key: key);
 
   @override
   State<HomeSectionMap> createState() => _HomeSectionMapState();
@@ -77,7 +78,7 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                   'accessToken': mapboxAccessToken,
                 },
               ),
-              PolylineLayer(
+              /* PolylineLayer(
                 polylines: [
                   Polyline(
                     strokeWidth: 4.0,
@@ -85,7 +86,7 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                     color: Colors.green,
                   ),
                 ],
-              ),
+              ), */
               MarkerLayer(
                 markers: [
                   Marker(

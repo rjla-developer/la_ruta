@@ -8,7 +8,7 @@ import 'package:la_ruta/widgets/home/home_section_search.dart';
 import 'package:latlong2/latlong.dart';
 
 //Functions:
-import 'package:la_ruta/utils/get_routes.dart';
+/* import 'package:la_ruta/utils/get_routes.dart'; */
 
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
@@ -21,17 +21,22 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<LatLng> routePoints = [];
-  final controllerResponseInputSearch = TextEditingController();
+  /* List<LatLng> routePoints = []; */
+  LatLng? targetPosition;
+
+  void setTargetPosition(LatLng position) {
+    setState(() {
+      targetPosition = position;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        HomeSectionMap(routePoints: routePoints),
-        HomeSectionSearch(
-            controllerResponseInputSearch: controllerResponseInputSearch),
-        Positioned(
+        const HomeSectionMap(/* routePoints: routePoints */),
+        HomeSectionSearch(setTargetPosition: setTargetPosition),
+        /* Positioned(
           bottom: 60,
           left: 50,
           right: 50,
@@ -87,7 +92,7 @@ class _HomeState extends State<Home> {
               ),
             ],
           ),
-        ),
+        ), */
       ],
     );
   }

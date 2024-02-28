@@ -5,32 +5,36 @@ import 'dart:async';
 //Http:
 import 'package:http/http.dart' as http;
 
+//Latlong2:
+import 'package:latlong2/latlong.dart';
+
 const searchLocationAccessToken =
     "pk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsa3JpOXNudDB2dG8zcXFtN3RqYzk2ZngifQ.OjfZuB4ku290h-qvB-BecA";
 
-class HomeSectionSearch extends StatefulWidget {
-  final TextEditingController controllerResponseInputSearch;
+const searchLocationSessionToken = '08aed845-b073-4761-88dd-bb2059d0caa8';
 
-  const HomeSectionSearch(
-      {super.key, required this.controllerResponseInputSearch});
+class HomeSectionSearch extends StatefulWidget {
+  final Function(LatLng) setTargetPosition;
+  const HomeSectionSearch({super.key, required this.setTargetPosition});
 
   @override
   State<HomeSectionSearch> createState() => _HomeSectionSearchState();
 }
 
 class _HomeSectionSearchState extends State<HomeSectionSearch> {
+  TextEditingController controllerResponseInputSearch = TextEditingController();
   var showModalSearch = false;
-  var responseLocations = [];
+  List responseLocations = [];
   Timer? _debounce;
 
   Future<void> getSearches() async {
-    String inputValue = widget.controllerResponseInputSearch.text;
+    String inputValue = controllerResponseInputSearch.text;
     var url = Uri.https('api.mapbox.com', '/search/searchbox/v1/suggest', {
       'q': inputValue,
       'language': 'es',
       'country': 'mx',
       'proximity': '-99.23426591658529, 18.921791278067488',
-      'session_token': '08aed845-b073-4761-88dd-bb2059d0caa8',
+      'session_token': searchLocationSessionToken,
       'access_token': searchLocationAccessToken
     });
     var response = await http.get(url);
@@ -38,6 +42,24 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     setState(() {
       responseLocations = jsonData['suggestions'];
     });
+  }
+
+  Future<void> getCoordinates(locationId) async {
+    /*pk.eyJ1Ijoic2VhcmNoLW1hY2hpbmUtdXNlci0xIiwiYSI6ImNrNnJ6bDdzdzA5cnAza3F4aTVwcWxqdWEifQ.RFF7CVFKrUsZVrJsFzhRvQ*/
+    /* &session_token=f4534cfc-5085-4605-bbd0-a77f1549d3ce */
+    var url = Uri.https(
+        'api.mapbox.com', '/search/searchbox/v1/retrieve/$locationId', {
+      'access_token': searchLocationAccessToken,
+      'session_token': searchLocationSessionToken
+    });
+    var response = await http.get(url);
+    Map<String, dynamic> jsonData = jsonDecode(response.body);
+    /* print('latitude: ${jsonData['features'][0]['geometry']['coordinates'][1]}');
+    print(
+        'longitude: ${jsonData['features'][0]['geometry']['coordinates'][0]}'); */
+    widget.setTargetPosition(LatLng(
+        jsonData['features'][0]['geometry']['coordinates'][1],
+        jsonData['features'][0]['geometry']['coordinates'][0]));
   }
 
   @override
@@ -70,8 +92,10 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                             TextButton(
                               onPressed: () {
                                 setState(() {
-                                  widget.controllerResponseInputSearch.text =
+                                  controllerResponseInputSearch.text =
                                       responseLocations[i]['name'];
+                                  getCoordinates(
+                                      responseLocations[i]['mapbox_id']);
                                 });
                               },
                               style: TextButton.styleFrom(
@@ -154,11 +178,11 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
               elevation: 8.0,
               borderRadius: BorderRadius.circular(30.0),
               child: TextField(
-                controller: widget.controllerResponseInputSearch,
+                controller: controllerResponseInputSearch,
                 onChanged: (value) {
                   if (_debounce?.isActive ?? false) _debounce?.cancel();
                   _debounce = Timer(const Duration(milliseconds: 200), () {
-                    if (widget.controllerResponseInputSearch.text.isEmpty) {
+                    if (controllerResponseInputSearch.text.isEmpty) {
                       setState(() {
                         responseLocations = [];
                       });
@@ -182,7 +206,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.clear),
                     onPressed: () => {
-                      widget.controllerResponseInputSearch.clear(),
+                      controllerResponseInputSearch.clear(),
                       setState(() {
                         responseLocations = [];
                       })
