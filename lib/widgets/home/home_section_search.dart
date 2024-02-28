@@ -96,6 +96,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                                       responseLocations[i]['name'];
                                   getCoordinates(
                                       responseLocations[i]['mapbox_id']);
+                                  showModalSearch = false;
                                 });
                               },
                               style: TextButton.styleFrom(

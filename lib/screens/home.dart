@@ -21,7 +21,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  /* List<LatLng> routePoints = []; */
   LatLng? targetPosition;
 
   void setTargetPosition(LatLng position) {
@@ -34,7 +33,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        const HomeSectionMap(/* routePoints: routePoints */),
+        HomeSectionMap(targetPosition: targetPosition),
         HomeSectionSearch(setTargetPosition: setTargetPosition),
         /* Positioned(
           bottom: 60,

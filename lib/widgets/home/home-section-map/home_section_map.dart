@@ -13,8 +13,8 @@ const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
 class HomeSectionMap extends StatefulWidget {
-  /* final List<LatLng> routePoints; */
-  const HomeSectionMap({Key? key /* ,required this.routePoints */})
+  final LatLng? targetPosition;
+  const HomeSectionMap({Key? key, required this.targetPosition})
       : super(key: key);
 
   @override
@@ -47,7 +47,6 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
     }
 
     var userPositionDetermined = await Geolocator.getCurrentPosition();
-    /* print(userPositionDetermined); */
     setState(() {
       userPosition = LatLng(
           userPositionDetermined.latitude, userPositionDetermined.longitude);
@@ -97,14 +96,23 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                       color: Color.fromARGB(255, 25, 176, 218),
                     ),
                   ),
-                  const Marker(
+                  if (widget.targetPosition != null)
+                    Marker(
+                      point: widget.targetPosition!,
+                      child: const Icon(
+                        Icons.location_pin,
+                        size: 50.0,
+                        color: Color.fromARGB(255, 170, 39, 39),
+                      ),
+                    ),
+                  /* const Marker(
                     point: LatLng(18.940714, -99.241622),
                     child: Icon(
                       Icons.directions_bus,
                       size: 50.0,
                       color: Color.fromARGB(255, 189, 39, 194),
                     ),
-                  ),
+                  ), */
                 ],
               ),
             ],
