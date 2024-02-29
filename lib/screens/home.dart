@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 //Widgets:
 import 'package:la_ruta/widgets/home/home-section-map/home_section_map.dart';
 import 'package:la_ruta/widgets/home/home_section_search.dart';
+import 'package:la_ruta/widgets/home/home_section_panel.dart';
 
 //Latlong2:
 import 'package:latlong2/latlong.dart';
@@ -61,41 +62,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       controller: _panelController,
       minHeight: 0,
       maxHeight: 300.0,
-      panel: Container(
-        decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 255, 255, 255),
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24.0),
-                topRight: Radius.circular(24.0)),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10.0,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
-            ]),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 15.0,
-                  horizontal: 15.0,
-                ),
-              ),
-              child: const Text(
-                'Santa María - Buena vista - Calera',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ),
-      ),
+      panel: const HomeSectionPanel(),
       body: Stack(
         children: <Widget>[
           HomeSectionMap(
