@@ -17,12 +17,23 @@ class HomeSectionPanel extends StatelessWidget {
                 color: Color.fromARGB(255, 0, 0, 0),
               ),
             ]),
-        child: const Column(
+        child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: 30,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: const BorderRadius.all(Radius.circular(12.0)),
+              ),
+            ),
+            const SizedBox(
               height: 30,
             ),
-            Text(
+            const Text(
               "Panel",
               textAlign: TextAlign.center,
             ),
