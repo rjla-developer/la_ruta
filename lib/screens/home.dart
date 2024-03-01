@@ -37,29 +37,37 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   LatLng? userPosition;
   LatLng? targetPosition;
   late final animatedMapController = AnimatedMapController(vsync: this);
-  final bool _useTransformer = true;
-  static const _useTransformerId = '_useTransformerId';
 
   //SlidingUpPanel:
-  final PanelController _panelController = PanelController();
+  final PanelController panelController = PanelController();
 
   void setTargetPosition(LatLng position) {
-    setState(() {
-      targetPosition = position;
-    });
-    _panelController.open();
-    {
-      final points = [userPosition, targetPosition];
-      animatedMapController.animatedFitCamera(
-        cameraFit: CameraFit.coordinates(
-          coordinates:
-              points.where((point) => point != null).cast<LatLng>().toList(),
-          padding: const EdgeInsets.all(80),
-        ),
-        rotation: 0,
-        customId: _useTransformer ? _useTransformerId : null,
-      );
+    if (position == const LatLng(0, 0)) {
+      setState(() {
+        targetPosition = null;
+      });
+      panelController.close();
+    } else {
+      setState(() {
+        targetPosition = position;
+      });
+      panelController.open();
     }
+    final points = [userPosition, targetPosition];
+    animatedMapController.animatedFitCamera(
+      cameraFit: CameraFit.coordinates(
+        coordinates:
+            points.where((point) => point != null).cast<LatLng>().toList(),
+        padding: const EdgeInsets.only(
+          top: 180,
+          right: 50,
+          bottom: 360,
+          left: 50,
+        ),
+      ),
+      rotation: 0,
+      customId: '_useTransformerId',
+    );
   }
 
   Future<Position> _determinePosition() async {
@@ -108,7 +116,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return SlidingUpPanel(
       renderPanelSheet: false,
-      controller: _panelController,
+      controller: panelController,
       minHeight: 0,
       maxHeight: 300.0,
       panel: const HomeSectionPanel(),
@@ -119,71 +127,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             targetPosition: targetPosition,
             animatedMapController: animatedMapController,
           ),
-          HomeSectionSearch(setTargetPosition: setTargetPosition),
-
-          /* Positioned(
-            bottom: 60,
-            left: 50,
-            right: 50,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: () async {
-                    var route =
-                        await getRoute("Santa María - Buena vista - Calera");
-                    setState(() {
-                      routePoints = route;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 15.0,
-                      horizontal: 15.0,
-                    ),
-                  ),
-                  child: const Text(
-                    'Santa María - Buena vista - Calera',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: () async {
-                    var route = await getRoute(
-                        "Santa María - Buena vista - Francisco Villa");
-                    setState(() {
-                      routePoints = route;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 15.0,
-                      horizontal: 15.0,
-                    ),
-                  ),
-                  child: const Text(
-                    'Santa María - Buena vista - Francisco Villa',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-          ), */
+          HomeSectionSearch(
+              setTargetPosition: setTargetPosition,
+              panelController: panelController),
           Positioned(
             bottom: 20,
             right: 20,
             child: FloatingActionButton(
               onPressed: () => animatedMapController.animatedZoomOut(
-                customId: _useTransformer ? _useTransformerId : null,
+                customId: '_useTransformerId',
               ),
               tooltip: 'Zoom out',
               child: const Icon(Icons.zoom_out),

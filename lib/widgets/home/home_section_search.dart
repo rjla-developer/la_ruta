@@ -8,6 +8,9 @@ import 'package:http/http.dart' as http;
 //Latlong2:
 import 'package:latlong2/latlong.dart';
 
+//SlidingUpPanel:
+import 'package:sliding_up_panel/sliding_up_panel.dart';
+
 const searchLocationAccessToken =
     "pk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsa3JpOXNudDB2dG8zcXFtN3RqYzk2ZngifQ.OjfZuB4ku290h-qvB-BecA";
 
@@ -15,7 +18,11 @@ const searchLocationSessionToken = '08aed845-b073-4761-88dd-bb2059d0caa8';
 
 class HomeSectionSearch extends StatefulWidget {
   final Function(LatLng) setTargetPosition;
-  const HomeSectionSearch({super.key, required this.setTargetPosition});
+  final PanelController panelController;
+  const HomeSectionSearch(
+      {super.key,
+      required this.setTargetPosition,
+      required this.panelController});
 
   @override
   State<HomeSectionSearch> createState() => _HomeSectionSearchState();
@@ -191,6 +198,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                   });
                 },
                 onTap: () {
+                  widget.panelController.close();
                   setState(() {
                     showModalSearch = true;
                   });
@@ -206,6 +214,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                     icon: const Icon(Icons.clear),
                     onPressed: () => {
                       controllerResponseInputSearch.clear(),
+                      widget.setTargetPosition(const LatLng(0, 0)),
                       setState(() {
                         responseLocations = [];
                       })
