@@ -31,6 +31,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with TickerProviderStateMixin {
+  /* LatLng? userPosition; */
   LatLng? targetPosition;
   late final animatedMapController = AnimatedMapController(vsync: this);
   bool useTransformer = true;
@@ -46,6 +47,19 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       targetPosition = position;
     });
     _panelController.open();
+    {
+      if (markers.value.isEmpty) return;
+
+      final points = [const LatLng(18.920164, -99.233274), position];
+      animatedMapController.animatedFitCamera(
+        cameraFit: CameraFit.coordinates(
+          coordinates: points,
+          padding: const EdgeInsets.all(180),
+        ),
+        rotation: 0,
+        customId: useTransformer ? useTransformerId : null,
+      );
+    }
   }
 
   @override
@@ -66,8 +80,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       body: Stack(
         children: <Widget>[
           HomeSectionMap(
-              targetPosition: targetPosition,
-              animatedMapController: animatedMapController),
+            targetPosition: targetPosition,
+            animatedMapController: animatedMapController,
+            markers: markers,
+          ),
           HomeSectionSearch(setTargetPosition: setTargetPosition),
 
           /* Positioned(
@@ -127,16 +143,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               ],
             ),
           ), */
-          Positioned(
-            bottom: 100,
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: () => setState(() {
-                show = !show;
-              }),
-              child: const Icon(Icons.grain),
-            ),
-          ),
           Positioned(
             bottom: 20,
             right: 20,
