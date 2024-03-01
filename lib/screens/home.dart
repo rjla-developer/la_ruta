@@ -43,14 +43,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   void setTargetPosition(LatLng position) {
     if (position == const LatLng(0, 0)) {
-      setState(() {
-        targetPosition = null;
-      });
+      setState(() => targetPosition = null);
       panelController.close();
     } else {
-      setState(() {
-        targetPosition = position;
-      });
+      setState(() => targetPosition = position);
       panelController.open();
     }
     final points = [userPosition, targetPosition];
@@ -93,10 +89,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     }
 
     var userPositionDetermined = await Geolocator.getCurrentPosition();
-    setState(() {
-      userPosition = LatLng(
-          userPositionDetermined.latitude, userPositionDetermined.longitude);
-    });
+    setState(() => userPosition = LatLng(
+        userPositionDetermined.latitude, userPositionDetermined.longitude));
     return userPositionDetermined;
   }
 

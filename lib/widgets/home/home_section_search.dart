@@ -46,9 +46,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     });
     var response = await http.get(url);
     Map<String, dynamic> jsonData = jsonDecode(response.body);
-    setState(() {
-      responseLocations = jsonData['suggestions'];
-    });
+    setState(() => responseLocations = jsonData['suggestions']);
   }
 
   Future<void> getCoordinates(locationId) async {
@@ -78,9 +76,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
           bottom: 0,
           child: GestureDetector(
             onTap: () {
-              setState(() {
-                showModalSearch = false;
-              });
+              setState(() => showModalSearch = false);
             },
             child: Material(
               color: const Color.fromARGB(248, 30, 30, 30),

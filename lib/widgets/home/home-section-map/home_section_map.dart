@@ -12,7 +12,7 @@ import 'package:flutter_map_animations/flutter_map_animations.dart';
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
-class HomeSectionMap extends StatefulWidget {
+class HomeSectionMap extends StatelessWidget {
   final LatLng? userPosition;
   final LatLng? targetPosition;
   final AnimatedMapController animatedMapController;
@@ -24,17 +24,12 @@ class HomeSectionMap extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<HomeSectionMap> createState() => _HomeSectionMapState();
-}
-
-class _HomeSectionMapState extends State<HomeSectionMap> {
-  @override
   Widget build(BuildContext context) {
-    return widget.userPosition != null
+    return userPosition != null
         ? FlutterMap(
-            mapController: widget.animatedMapController.mapController,
+            mapController: animatedMapController.mapController,
             options: MapOptions(
-              initialCenter: widget.userPosition!,
+              initialCenter: userPosition!,
               initialZoom: 17,
               maxZoom: 22,
               minZoom: 9.5,
@@ -51,7 +46,7 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
               AnimatedMarkerLayer(
                 markers: [
                   AnimatedMarker(
-                    point: widget.userPosition!,
+                    point: userPosition!,
                     builder: (_, animation) {
                       final size = 50.0 * animation.value;
                       return Icon(
@@ -61,9 +56,9 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                       );
                     },
                   ),
-                  if (widget.targetPosition != null)
+                  if (targetPosition != null)
                     AnimatedMarker(
-                      point: widget.targetPosition!,
+                      point: targetPosition!,
                       builder: (_, animation) {
                         final size = 50.0 * animation.value;
                         return Icon(
