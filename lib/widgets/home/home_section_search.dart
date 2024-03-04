@@ -12,13 +12,20 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:la_ruta/providers/controls_map_provider.dart';
 
+//FlutterMapAnimations:
+import 'package:flutter_map_animations/flutter_map_animations.dart';
+
+//FlutterMap:
+import 'package:flutter_map/flutter_map.dart';
+
 const searchLocationAccessToken =
     "pk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsa3JpOXNudDB2dG8zcXFtN3RqYzk2ZngifQ.OjfZuB4ku290h-qvB-BecA";
 
 const searchLocationSessionToken = '08aed845-b073-4761-88dd-bb2059d0caa8';
 
 class HomeSectionSearch extends StatefulWidget {
-  const HomeSectionSearch({super.key});
+  final AnimatedMapController animatedMapController;
+  const HomeSectionSearch({super.key, required this.animatedMapController});
 
   @override
   State<HomeSectionSearch> createState() => _HomeSectionSearchState();
@@ -59,6 +66,25 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     controlsMapProvider.setTargetPosition(LatLng(
         jsonData['features'][0]['geometry']['coordinates'][1],
         jsonData['features'][0]['geometry']['coordinates'][0]));
+
+    final points = [
+      controlsMapProvider.userPosition,
+      controlsMapProvider.targetPosition
+    ];
+    widget.animatedMapController.animatedFitCamera(
+      cameraFit: CameraFit.coordinates(
+        coordinates:
+            points.where((point) => point != null).cast<LatLng>().toList(),
+        padding: const EdgeInsets.only(
+          top: 180,
+          right: 50,
+          bottom: 360,
+          left: 50,
+        ),
+      ),
+      rotation: 0,
+      customId: '_useTransformerId',
+    );
   }
 
   @override

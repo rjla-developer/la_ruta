@@ -51,7 +51,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           HomeSectionMap(
             animatedMapController: animatedMapController,
           ),
-          const HomeSectionSearch(),
+          HomeSectionSearch(
+            animatedMapController: animatedMapController,
+          ),
           Positioned(
             bottom: 20,
             right: 20,

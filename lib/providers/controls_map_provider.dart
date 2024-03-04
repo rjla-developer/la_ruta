@@ -50,28 +50,11 @@ class ControlsMapProvider extends ChangeNotifier {
     if (position == const LatLng(0, 0)) {
       _targetPosition = null;
       panelController.close();
-      notifyListeners();
     } else {
       _targetPosition = position;
       panelController.open();
-      notifyListeners();
     }
-    final points = [_userPosition, _targetPosition];
-
-    /* animatedMapController.animatedFitCamera(
-      cameraFit: CameraFit.coordinates(
-        coordinates:
-            points.where((point) => point != null).cast<LatLng>().toList(),
-        padding: const EdgeInsets.only(
-          top: 180,
-          right: 50,
-          bottom: 360,
-          left: 50,
-        ),
-      ),
-      rotation: 0,
-      customId: '_useTransformerId',
-    ); */
+    notifyListeners();
   }
 
   ControlsMapProvider() {
