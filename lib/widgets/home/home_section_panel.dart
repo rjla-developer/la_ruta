@@ -1,5 +1,8 @@
 import "package:flutter/material.dart";
 
+//Widgets:
+import "package:la_ruta/widgets/home/home-section-panel/item_option_route.dart";
+
 class HomeSectionPanel extends StatelessWidget {
   const HomeSectionPanel({super.key});
 
@@ -33,77 +36,16 @@ class HomeSectionPanel extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Row(
-                  children: [
-                    Image(
-                      image: NetworkImage(
-                        'https://queruta.mx/wp-content/uploads/2023/10/5.png',
-                      ),
-                      width: 100,
-                      height: 80,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Material(
-                      color: Colors.transparent,
-                      child: Column(
-                        /* crossAxisAlignment: CrossAxisAlignment.end, */
-                        children: [
-                          Text(
-                            'Dirección:',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                          Text(
-                            'Santa María - Buena vista - Calera',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          /* Text(
-                            'Esta ruta llega cada:',
-                            style: TextStyle(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 2,
-                          ),
-                          Text(
-                            '8 a 10 minutos',
-                            style: TextStyle(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ), */
-                        ],
-                      ),
-                    ),
-                  ],
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              children: const [
+                ItemOptionRoute(),
+                SizedBox(
+                  height: 20,
                 ),
-              ),
+              ],
             ),
-          ),
-          const SizedBox(
-            height: 20,
           ),
         ],
       ),
