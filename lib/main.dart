@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+//Providers:
+import 'package:provider/provider.dart';
+
+//Class providers:
+import 'package:la_ruta/providers/controls_map_provider.dart';
+
 //Screens:
 import 'screens/home.dart';
 
@@ -12,14 +18,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: true,
-      title: 'La Ruta',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ControlsMapProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: true,
+        title: 'La Ruta',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: const Home(),
       ),
-      home: const Home(),
     );
   }
 }
