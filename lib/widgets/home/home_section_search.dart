@@ -98,9 +98,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
           right: 0,
           bottom: 0,
           child: GestureDetector(
-            onTap: () {
-              setState(() => _showModalSearch = false);
-            },
+            onTap: () => setState(() => _showModalSearch = false),
             child: Material(
               color: const Color.fromARGB(248, 30, 30, 30),
               child: Column(
@@ -208,9 +206,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                   if (_debounce?.isActive ?? false) _debounce?.cancel();
                   _debounce = Timer(const Duration(milliseconds: 200), () {
                     if (controllerResponseInputSearch.text.isEmpty) {
-                      setState(() {
-                        responseLocations = [];
-                      });
+                      setState(() => responseLocations = []);
                     } else {
                       getSearches();
                     }
@@ -218,9 +214,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                 },
                 onTap: () {
                   controlsMapProvider.panelController.close();
-                  setState(() {
-                    _showModalSearch = true;
-                  });
+                  setState(() => _showModalSearch = true);
                 },
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
@@ -234,9 +228,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                     onPressed: () => {
                       controllerResponseInputSearch.clear(),
                       controlsMapProvider.setTargetPosition(const LatLng(0, 0)),
-                      setState(() {
-                        responseLocations = [];
-                      })
+                      setState(() => responseLocations = [])
                     },
                   ),
                 ),
