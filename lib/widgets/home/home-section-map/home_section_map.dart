@@ -3,37 +3,34 @@ import 'package:flutter/material.dart';
 //FlutterMap:
 import 'package:flutter_map/flutter_map.dart';
 
-//Latlong2:
-import 'package:latlong2/latlong.dart';
-
 //FlutterMapAnimations:
 import 'package:flutter_map_animations/flutter_map_animations.dart';
+
+//Providers:
+import 'package:provider/provider.dart';
+import 'package:la_ruta/providers/controls_map_provider.dart';
 
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
 class HomeSectionMap extends StatelessWidget {
-  final LatLng? userPosition;
-  final LatLng? targetPosition;
   final AnimatedMapController animatedMapController;
   const HomeSectionMap({
     Key? key,
-    required this.userPosition,
-    required this.targetPosition,
     required this.animatedMapController,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return userPosition != null
+    final controlsMapProvider = context.watch<ControlsMapProvider>();
+    return controlsMapProvider.userPosition != null
         ? FlutterMap(
             mapController: animatedMapController.mapController,
             options: MapOptions(
-              initialCenter: userPosition!,
+              initialCenter: controlsMapProvider.userPosition!,
               initialZoom: 17,
               maxZoom: 22,
               minZoom: 9.5,
-              /* onTap: (_, point) => _addMarker(point), */
             ),
             children: [
               TileLayer(
@@ -46,7 +43,7 @@ class HomeSectionMap extends StatelessWidget {
               AnimatedMarkerLayer(
                 markers: [
                   AnimatedMarker(
-                    point: userPosition!,
+                    point: controlsMapProvider.userPosition!,
                     builder: (_, animation) {
                       final size = 50.0 * animation.value;
                       return Icon(
@@ -56,9 +53,9 @@ class HomeSectionMap extends StatelessWidget {
                       );
                     },
                   ),
-                  if (targetPosition != null)
+                  if (controlsMapProvider.targetPosition != null)
                     AnimatedMarker(
-                      point: targetPosition!,
+                      point: controlsMapProvider.targetPosition!,
                       builder: (_, animation) {
                         final size = 50.0 * animation.value;
                         return Icon(

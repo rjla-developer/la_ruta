@@ -8,8 +8,15 @@ import 'package:http/http.dart' as http;
 //Latlong2:
 import 'package:latlong2/latlong.dart';
 
-//SlidingUpPanel:
-import 'package:sliding_up_panel/sliding_up_panel.dart';
+//Providers:
+import 'package:provider/provider.dart';
+import 'package:la_ruta/providers/controls_map_provider.dart';
+
+//FlutterMapAnimations:
+import 'package:flutter_map_animations/flutter_map_animations.dart';
+
+//FlutterMap:
+import 'package:flutter_map/flutter_map.dart';
 
 const searchLocationAccessToken =
     "pk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsa3JpOXNudDB2dG8zcXFtN3RqYzk2ZngifQ.OjfZuB4ku290h-qvB-BecA";
@@ -17,12 +24,8 @@ const searchLocationAccessToken =
 const searchLocationSessionToken = '08aed845-b073-4761-88dd-bb2059d0caa8';
 
 class HomeSectionSearch extends StatefulWidget {
-  final Function(LatLng) setTargetPosition;
-  final PanelController panelController;
-  const HomeSectionSearch(
-      {super.key,
-      required this.setTargetPosition,
-      required this.panelController});
+  final AnimatedMapController animatedMapController;
+  const HomeSectionSearch({super.key, required this.animatedMapController});
 
   @override
   State<HomeSectionSearch> createState() => _HomeSectionSearchState();
@@ -30,7 +33,7 @@ class HomeSectionSearch extends StatefulWidget {
 
 class _HomeSectionSearchState extends State<HomeSectionSearch> {
   TextEditingController controllerResponseInputSearch = TextEditingController();
-  var showModalSearch = false;
+  var _showModalSearch = false;
   List responseLocations = [];
   Timer? _debounce;
 
@@ -49,7 +52,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     setState(() => responseLocations = jsonData['suggestions']);
   }
 
-  Future<void> getCoordinates(locationId) async {
+  Future<void> getCoordinates(controlsMapProvider, locationId) async {
     var url = Uri.https(
         'api.mapbox.com', '/search/searchbox/v1/retrieve/$locationId', {
       'access_token': searchLocationAccessToken,
@@ -60,24 +63,42 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     /* print('latitude: ${jsonData['features'][0]['geometry']['coordinates'][1]}');
     print(
         'longitude: ${jsonData['features'][0]['geometry']['coordinates'][0]}'); */
-    widget.setTargetPosition(LatLng(
+    controlsMapProvider.setTargetPosition(LatLng(
         jsonData['features'][0]['geometry']['coordinates'][1],
         jsonData['features'][0]['geometry']['coordinates'][0]));
+
+    final points = [
+      controlsMapProvider.userPosition,
+      controlsMapProvider.targetPosition
+    ];
+    widget.animatedMapController.animatedFitCamera(
+      cameraFit: CameraFit.coordinates(
+        coordinates:
+            points.where((point) => point != null).cast<LatLng>().toList(),
+        padding: const EdgeInsets.only(
+          top: 180,
+          right: 50,
+          bottom: 360,
+          left: 50,
+        ),
+      ),
+      rotation: 0,
+      customId: '_useTransformerId',
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final controlsMapProvider = context.watch<ControlsMapProvider>();
     return Stack(children: [
-      if (showModalSearch) ...[
+      if (_showModalSearch) ...[
         Positioned(
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
           child: GestureDetector(
-            onTap: () {
-              setState(() => showModalSearch = false);
-            },
+            onTap: () => setState(() => _showModalSearch = false),
             child: Material(
               color: const Color.fromARGB(248, 30, 30, 30),
               child: Column(
@@ -95,9 +116,9 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                                 setState(() {
                                   controllerResponseInputSearch.text =
                                       responseLocations[i]['name'];
-                                  getCoordinates(
+                                  getCoordinates(controlsMapProvider,
                                       responseLocations[i]['mapbox_id']);
-                                  showModalSearch = false;
+                                  _showModalSearch = false;
                                 });
                               },
                               style: TextButton.styleFrom(
@@ -185,19 +206,15 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                   if (_debounce?.isActive ?? false) _debounce?.cancel();
                   _debounce = Timer(const Duration(milliseconds: 200), () {
                     if (controllerResponseInputSearch.text.isEmpty) {
-                      setState(() {
-                        responseLocations = [];
-                      });
+                      setState(() => responseLocations = []);
                     } else {
                       getSearches();
                     }
                   });
                 },
                 onTap: () {
-                  widget.panelController.close();
-                  setState(() {
-                    showModalSearch = true;
-                  });
+                  controlsMapProvider.panelController.close();
+                  setState(() => _showModalSearch = true);
                 },
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
@@ -210,10 +227,8 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                     icon: const Icon(Icons.clear),
                     onPressed: () => {
                       controllerResponseInputSearch.clear(),
-                      widget.setTargetPosition(const LatLng(0, 0)),
-                      setState(() {
-                        responseLocations = [];
-                      })
+                      controlsMapProvider.setTargetPosition(const LatLng(0, 0)),
+                      setState(() => responseLocations = [])
                     },
                   ),
                 ),
