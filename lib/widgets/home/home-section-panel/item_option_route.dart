@@ -1,5 +1,8 @@
 import "package:flutter/material.dart";
 
+//Functions:
+import "package:la_ruta/utils/get_routes.dart";
+
 class ItemOptionRoute extends StatelessWidget {
   const ItemOptionRoute({super.key});
 
@@ -10,7 +13,9 @@ class ItemOptionRoute extends StatelessWidget {
       borderRadius: const BorderRadius.all(Radius.circular(12.0)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12.0),
-        onTap: () {},
+        onTap: () {
+          getRoute(context);
+        },
         child: const Padding(
           padding: EdgeInsets.all(10.0),
           child: Row(

@@ -78,15 +78,15 @@ class HomeSectionMap extends StatelessWidget {
                           );
                         },
                       ), */
-              /* PolylineLayer(
-                  polylines: [
-                    Polyline(
-                      strokeWidth: 4.0,
-                      points: widget.routePoints,
-                      color: Colors.green,
-                    ),
-                  ],
-                ), */
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    strokeWidth: 4.0,
+                    points: controlsMapProvider.route,
+                    color: Colors.green,
+                  ),
+                ],
+              ),
             ],
           )
         : const Center(child: CircularProgressIndicator());

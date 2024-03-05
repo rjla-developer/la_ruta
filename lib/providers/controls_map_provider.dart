@@ -13,10 +13,12 @@ class ControlsMapProvider extends ChangeNotifier {
   LatLng? _userPosition;
   LatLng? _targetPosition;
   final PanelController _panelController = PanelController();
+  final List<LatLng> _route = [];
 
   LatLng? get userPosition => _userPosition;
   LatLng? get targetPosition => _targetPosition;
   PanelController get panelController => _panelController;
+  List<LatLng> get route => _route;
 
   Future<void> _setUserPosition() async {
     bool serviceEnabled;
@@ -54,6 +56,13 @@ class ControlsMapProvider extends ChangeNotifier {
       _targetPosition = position;
       panelController.open();
     }
+    notifyListeners();
+  }
+
+  set route(List<LatLng> value) {
+    print(value);
+    _route.clear();
+    _route.addAll(value);
     notifyListeners();
   }
 
