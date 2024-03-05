@@ -30,10 +30,29 @@ const dataRoutes = {
 
     LatLng(18.957835, -99.266824), //Destino
   ],
+  "Tetela": [
+    LatLng(18.888783, -99.231194), //Origen
+
+    LatLng(18.891926, -99.230052), //
+
+    LatLng(18.891782, -99.230938), //INACAAI
+
+    //(El punto medio puede ser el mismo que el de Ahuatlán)
+
+    LatLng(18.965252, -99.247093), //Glorieta de Zapata
+
+    LatLng(18.960000, -99.255236), //
+
+    LatLng(18.970147, -99.267264), //Vivero los cedros
+
+    LatLng(18.967139, -99.267531), //Vivero Popotla II
+
+    LatLng(18.961791, -99.258670), //Destino
+  ]
 };
 
 String getCoords() {
-  var _route = dataRoutes["Ahuatlán"];
+  var _route = dataRoutes["Tetela"];
 
   return _route!
       .map((waypoint) => '${waypoint.longitude},${waypoint.latitude}')
