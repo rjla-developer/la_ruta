@@ -23,9 +23,7 @@ const dataRoutes = {
 };
 
 String getCoords(controlsMapProvider) {
-  var _route;
-
-  _route = [
+  var _route = [
     controlsMapProvider.userPosition,
     controlsMapProvider.targetPosition,
   ];
