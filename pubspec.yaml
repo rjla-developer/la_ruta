@@ -19,6 +19,8 @@ dependencies:
   flutter_map_animations: ^0.5.3
   sliding_up_panel: ^2.0.0+1
   provider: ^6.1.2
+  archive: ^3.4.10
+  csv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -31,7 +33,8 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/jsons/search-places.json
+    - assets/gtfs/sample.zip
+    - assets/gtfs/ruta3_ahuatlan.zip
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
