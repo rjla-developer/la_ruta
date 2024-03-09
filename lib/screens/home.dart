@@ -9,7 +9,7 @@ import 'package:csv/csv.dart';
 //Widgets:
 import 'package:la_ruta/widgets/home/home-section-map/home_section_map.dart';
 import 'package:la_ruta/widgets/home/home_section_search.dart';
-import 'package:la_ruta/widgets/home/home_section_panel.dart';
+import 'package:la_ruta/widgets/home/home-section-panel/home_section_panel.dart';
 
 //FlutterMapAnimations:
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -48,11 +48,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     final byteData = await rootBundle.load('assets/gtfs/ruta3_ahuatlan.zip');
     final bytes = byteData.buffer.asUint8List();
     final archive = ZipDecoder().decodeBytes(bytes);
-
-    /* for (var file in archive) {
-      print(file.name);
-    } */
-
     final shapesFile = archive.findFile('ruta3_ahuatlan/shapes.txt');
 
     if (shapesFile != null) {

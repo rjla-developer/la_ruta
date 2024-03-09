@@ -33,7 +33,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/gtfs/sample.zip
     - assets/gtfs/ruta3_ahuatlan.zip
 
   # An image asset can refer to one or more resolution-specific "variants", see
