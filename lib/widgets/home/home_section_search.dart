@@ -122,6 +122,9 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     //Aquí estamos buscando el archivo que contiene la información de las rutas de autobús.
     final stopsFile = archive.findFile('ruta3_ahuatlan/stops.txt');
 
+    List? closeStopFromOrigin;
+    List? closeStopFromDestination;
+
     if (stopsFile != null) {
       //Aquí estamos leyendo el contenido del archivo.
       final stopsData = utf8.decode(stopsFile.content);
@@ -130,9 +133,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
       //Aquí estamos creando una lista vacía que contendrá todas las formas de las rutas de autobús.
       List<List<String>> stopsInfo = [];
       const double limitDistance = 1000.0;
-      LatLng closestStopToUser = const LatLng(0, 0);
       double closestStopDistance = double.infinity;
-      LatLng closestRouteToDestination = const LatLng(0, 0);
       double closestRouteDistance = double.infinity;
 
       for (int i = 0; i < splitByLinesStopData.length; i++) {
@@ -147,19 +148,20 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
               calculateDistance(destination!, fieldCoordinates);
 
           if (distanceUserToNextStop < closestStopDistance) {
-            //Aquí estamos actualizando las coordenadas de la parada más cercana al origen del usuario.
-            closestStopToUser = fieldCoordinates;
+            //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario.
+            closeStopFromOrigin = fields;
             //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario.
             closestStopDistance = distanceUserToNextStop;
           }
 
           if (distanceDestinationToNextStop < closestRouteDistance) {
-            //Aquí estamos actualizando las coordenadas de la parada más cercana al destino del usuario.
-            closestRouteToDestination = fieldCoordinates;
+            //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario.
+            closeStopFromDestination = fields;
             //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario.
             closestRouteDistance = distanceDestinationToNextStop;
           }
         }
+
         //Aquí estamos agregando los campos de cada línea a la lista de formas de las rutas de autobús.
         //En este caso no se necesita pero en el futuro quiero mostrar todas las paradas de las rutas en el mapa.
         //Esa variable tendra toda la informacion de las paradas de las rutas de autobus.
@@ -170,9 +172,12 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
       if (closestRouteDistance > limitDistance) {
         print('No hay rutas cerca de tu destino.');
       } else {
-        print('La parada más cercana a ti está en: $closestStopToUser');
+        controlsMapProvider.setCloseStopFromOrigin(closeStopFromOrigin!);
+        controlsMapProvider
+            .setCloseStopFromDestination(closeStopFromDestination!);
+        print('La parada más cercana a ti está en: $closeStopFromOrigin');
         print(
-            'La ruta más cercana a tu destino está en: $closestRouteToDestination');
+            'La ruta más cercana a tu destino está en: $closeStopFromDestination');
       }
     }
   }

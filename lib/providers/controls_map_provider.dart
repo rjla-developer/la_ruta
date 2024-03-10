@@ -13,11 +13,15 @@ class ControlsMapProvider extends ChangeNotifier {
   LatLng? _userPosition;
   LatLng? _targetPosition;
   final PanelController _panelController = PanelController();
+  List? _closeStopFromOrigin;
+  List? _closeStopFromDestination;
   final List<LatLng> _route = [];
 
   LatLng? get userPosition => _userPosition;
   LatLng? get targetPosition => _targetPosition;
   PanelController get panelController => _panelController;
+  List? get closeStopFromOrigin => _closeStopFromOrigin;
+  List? get closeStopFromDestination => _closeStopFromDestination;
   List<LatLng> get route => _route;
 
   Future<void> _setUserPosition() async {
@@ -60,9 +64,18 @@ class ControlsMapProvider extends ChangeNotifier {
   }
 
   set route(List<LatLng> value) {
-    print(value);
     _route.clear();
     _route.addAll(value);
+    notifyListeners();
+  }
+
+  void setCloseStopFromOrigin(List value) {
+    _closeStopFromOrigin = value;
+    notifyListeners();
+  }
+
+  void setCloseStopFromDestination(List value) {
+    _closeStopFromDestination = value;
     notifyListeners();
   }
 
