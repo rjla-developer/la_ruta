@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+
+//Dart:
 import 'dart:convert';
+import 'package:archive/archive.dart';
 import 'dart:async';
+import 'dart:math';
 
 //Http:
 import 'package:http/http.dart' as http;
@@ -52,7 +57,8 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     setState(() => responseLocations = jsonData['suggestions']);
   }
 
-  Future<void> getCoordinates(controlsMapProvider, locationId) async {
+  Future<void> getDestinationCoordinates(
+      controlsMapProvider, locationId) async {
     var url = Uri.https(
         'api.mapbox.com', '/search/searchbox/v1/retrieve/$locationId', {
       'access_token': searchLocationAccessToken,
@@ -87,6 +93,90 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     );
   }
 
+  double calculateDistance(LatLng point1, LatLng point2) {
+    const R = 6371e3; // Esto es el radio de la Tierra en metros
+    var lat1 = point1.latitude * pi / 180;
+    var lat2 = point2.latitude * pi / 180;
+    var deltaLat = (point2.latitude - point1.latitude) * pi / 180;
+    var deltaLon = (point2.longitude - point1.longitude) * pi / 180;
+
+    var a = sin(deltaLat / 2) * sin(deltaLat / 2) +
+        cos(lat1) * cos(lat2) * sin(deltaLon / 2) * sin(deltaLon / 2);
+    var c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return R * c;
+  }
+
+  void getOptionsRoutes(BuildContext context) async {
+    final controlsMapProvider =
+        Provider.of<ControlsMapProvider>(context, listen: false);
+    LatLng? userLocation = controlsMapProvider.userPosition;
+    LatLng? destination = controlsMapProvider.targetPosition;
+
+    //Aquí estamos abriendo un archivo que contiene información sobre todas las rutas de autobús.
+    final byteData = await rootBundle.load('assets/gtfs/ruta3_ahuatlan.zip');
+    //Aquí estamos leyendo el archivo.
+    final bytes = byteData.buffer.asUint8List();
+    //Aquí estamos descomprimiendo el archivo, ya que viene en un archivo (.zip).
+    final archive = ZipDecoder().decodeBytes(bytes);
+    //Aquí estamos buscando el archivo que contiene la información de las rutas de autobús.
+    final stopsFile = archive.findFile('ruta3_ahuatlan/stops.txt');
+
+    if (stopsFile != null) {
+      //Aquí estamos leyendo el contenido del archivo.
+      final stopsData = utf8.decode(stopsFile.content);
+      //Aquí estamos dividiendo el contenido del archivo en líneas, ya que el archivo 'stops.txt', es un archivo de texto que contiene varias líneas de datos.
+      final splitByLinesStopData = stopsData.split('\n');
+      //Aquí estamos creando una lista vacía que contendrá todas las formas de las rutas de autobús.
+      List<List<String>> stopsInfo = [];
+      const double limitDistance = 1000.0;
+      LatLng closestStopToUser = const LatLng(0, 0);
+      double closestStopDistance = double.infinity;
+      LatLng closestRouteToDestination = const LatLng(0, 0);
+      double closestRouteDistance = double.infinity;
+
+      for (int i = 0; i < splitByLinesStopData.length; i++) {
+        //Aquí estamos dividiendo cada línea en campos.
+        var fields = splitByLinesStopData[i].split(',');
+        if (i > 0) {
+          var fieldCoordinates =
+              LatLng(double.parse(fields[2]), double.parse(fields[3]));
+          var distanceUserToNextStop =
+              calculateDistance(userLocation!, fieldCoordinates);
+          var distanceDestinationToNextStop =
+              calculateDistance(destination!, fieldCoordinates);
+
+          if (distanceUserToNextStop < closestStopDistance) {
+            //Aquí estamos actualizando las coordenadas de la parada más cercana al origen del usuario.
+            closestStopToUser = fieldCoordinates;
+            //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario.
+            closestStopDistance = distanceUserToNextStop;
+          }
+
+          if (distanceDestinationToNextStop < closestRouteDistance) {
+            //Aquí estamos actualizando las coordenadas de la parada más cercana al destino del usuario.
+            closestRouteToDestination = fieldCoordinates;
+            //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario.
+            closestRouteDistance = distanceDestinationToNextStop;
+          }
+        }
+        //Aquí estamos agregando los campos de cada línea a la lista de formas de las rutas de autobús.
+        //En este caso no se necesita pero en el futuro quiero mostrar todas las paradas de las rutas en el mapa.
+        //Esa variable tendra toda la informacion de las paradas de las rutas de autobus.
+        stopsInfo.add(fields);
+      }
+
+      // Si no hay rutas cerca del destino del usuario, informa al usuario
+      if (closestRouteDistance > limitDistance) {
+        print('No hay rutas cerca de tu destino.');
+      } else {
+        print('La parada más cercana a ti está en: $closestStopToUser');
+        print(
+            'La ruta más cercana a tu destino está en: $closestRouteToDestination');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final controlsMapProvider = context.watch<ControlsMapProvider>();
@@ -116,8 +206,9 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                                 setState(() {
                                   controllerResponseInputSearch.text =
                                       responseLocations[i]['name'];
-                                  getCoordinates(controlsMapProvider,
+                                  getDestinationCoordinates(controlsMapProvider,
                                       responseLocations[i]['mapbox_id']);
+                                  getOptionsRoutes(context);
                                   _showModalSearch = false;
                                 });
                               },
