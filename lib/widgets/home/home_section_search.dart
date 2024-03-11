@@ -91,6 +91,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
       rotation: 0,
       customId: '_useTransformerId',
     );
+    getOptionsRoutes(controlsMapProvider);
   }
 
   double calculateDistance(LatLng point1, LatLng point2) {
@@ -107,9 +108,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     return R * c;
   }
 
-  void getOptionsRoutes(BuildContext context) async {
-    final controlsMapProvider =
-        Provider.of<ControlsMapProvider>(context, listen: false);
+  void getOptionsRoutes(controlsMapProvider) async {
     LatLng? userLocation = controlsMapProvider.userPosition;
     LatLng? destination = controlsMapProvider.targetPosition;
 
@@ -122,8 +121,8 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     //Aquí estamos buscando el archivo que contiene la información de las rutas de autobús.
     final stopsFile = archive.findFile('ruta3_ahuatlan/stops.txt');
 
-    List? closeStopFromOrigin;
-    List? closeStopFromDestination;
+    List closeStopFromOrigin = [];
+    List closeStopFromDestination = [];
 
     if (stopsFile != null) {
       //Aquí estamos leyendo el contenido del archivo.
@@ -172,9 +171,9 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
       if (closestRouteDistance > limitDistance) {
         print('No hay rutas cerca de tu destino.');
       } else {
-        controlsMapProvider.setCloseStopFromOrigin(closeStopFromOrigin!);
+        controlsMapProvider.setCloseStopFromOrigin(closeStopFromOrigin);
         controlsMapProvider
-            .setCloseStopFromDestination(closeStopFromDestination!);
+            .setCloseStopFromDestination(closeStopFromDestination);
         print('La parada más cercana a ti está en: $closeStopFromOrigin');
         print(
             'La ruta más cercana a tu destino está en: $closeStopFromDestination');
@@ -213,7 +212,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                                       responseLocations[i]['name'];
                                   getDestinationCoordinates(controlsMapProvider,
                                       responseLocations[i]['mapbox_id']);
-                                  getOptionsRoutes(context);
+
                                   _showModalSearch = false;
                                 });
                               },

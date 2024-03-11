@@ -35,58 +35,60 @@ class _ItemOptionRouteState extends State<ItemOptionRoute> {
               SizedBox(
                 width: 20,
               ),
-              Material(
-                color: Colors.transparent,
-                child: Column(
-                  children: [
-                    Text(
-                      'Dirección:',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.left,
-                    ),
-                    Text(
-                      'Santa María - Buena vista - Calera',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Tiempo estimado al destino:',
-                      style: TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 2,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.timer,
-                          size: 12.0,
-                          color: Colors.black,
+              Flexible(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Column(
+                    children: [
+                      Text(
+                        'Dirección:',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(
-                          width: 2,
+                        textAlign: TextAlign.left,
+                      ),
+                      Text(
+                        'Santa María - Buena vista - Calera',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.bold,
                         ),
-                        Text(
-                          '50 minutos',
-                          style: TextStyle(
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.bold,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Tiempo estimado al destino:',
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 2,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.timer,
+                            size: 12.0,
+                            color: Colors.black,
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          SizedBox(
+                            width: 2,
+                          ),
+                          Text(
+                            '50 minutos',
+                            style: TextStyle(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

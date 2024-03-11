@@ -6,6 +6,9 @@ import 'package:flutter_map/flutter_map.dart';
 //FlutterMapAnimations:
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 
+//Latlong2:
+import 'package:latlong2/latlong.dart';
+
 //Providers:
 import 'package:provider/provider.dart';
 import 'package:la_ruta/providers/controls_map_provider.dart';
@@ -13,7 +16,7 @@ import 'package:la_ruta/providers/controls_map_provider.dart';
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
-class HomeSectionMap extends StatelessWidget {
+class HomeSectionMap extends StatefulWidget {
   final AnimatedMapController animatedMapController;
   const HomeSectionMap({
     Key? key,
@@ -21,11 +24,17 @@ class HomeSectionMap extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<HomeSectionMap> createState() => _HomeSectionMapState();
+}
+
+class _HomeSectionMapState extends State<HomeSectionMap> {
+  @override
   Widget build(BuildContext context) {
     final controlsMapProvider = context.watch<ControlsMapProvider>();
+
     return controlsMapProvider.userPosition != null
         ? FlutterMap(
-            mapController: animatedMapController.mapController,
+            mapController: widget.animatedMapController.mapController,
             options: MapOptions(
               initialCenter: controlsMapProvider.userPosition!,
               initialZoom: 17,
@@ -62,6 +71,38 @@ class HomeSectionMap extends StatelessWidget {
                           Icons.location_pin,
                           size: size,
                           color: const Color.fromARGB(255, 170, 39, 39),
+                        );
+                      },
+                    ),
+                  if (controlsMapProvider.closeStopFromOrigin != null)
+                    AnimatedMarker(
+                      point: LatLng(
+                          double.parse(
+                              controlsMapProvider.closeStopFromOrigin?[2]),
+                          double.parse(
+                              controlsMapProvider.closeStopFromOrigin?[3])),
+                      builder: (_, animation) {
+                        final size = 50.0 * animation.value;
+                        return Icon(
+                          Icons.flag_circle_rounded,
+                          size: size,
+                          color: const Color.fromARGB(255, 164, 188, 213),
+                        );
+                      },
+                    ),
+                  if (controlsMapProvider.closeStopFromDestination != null)
+                    AnimatedMarker(
+                      point: LatLng(
+                          double.parse(
+                              controlsMapProvider.closeStopFromDestination?[2]),
+                          double.parse(controlsMapProvider
+                              .closeStopFromDestination?[3])),
+                      builder: (_, animation) {
+                        final size = 50.0 * animation.value;
+                        return Icon(
+                          Icons.flag_circle_rounded,
+                          size: size,
+                          color: const Color.fromARGB(255, 164, 188, 213),
                         );
                       },
                     ),
