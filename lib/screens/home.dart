@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
-
-//Dart:
-import 'dart:convert';
-import 'package:archive/archive.dart';
-import 'package:csv/csv.dart';
 
 //Widgets:
 import 'package:la_ruta/widgets/home/home-section-map/home_section_map.dart';
@@ -13,7 +7,6 @@ import 'package:la_ruta/widgets/home/home-section-panel/home_section_panel.dart'
 
 //FlutterMapAnimations:
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:latlong2/latlong.dart';
 
 //SlidingUpPanel:
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -41,38 +34,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void loadGtfsData(BuildContext context) async {
-    final controlsMapProvider =
-        Provider.of<ControlsMapProvider>(context, listen: false);
-
-    final byteData = await rootBundle.load('assets/gtfs/ruta3_ahuatlan.zip');
-    final bytes = byteData.buffer.asUint8List();
-    final archive = ZipDecoder().decodeBytes(bytes);
-    final shapesFile = archive.findFile('ruta3_ahuatlan/shapes.txt');
-
-    if (shapesFile != null) {
-      final shapesData = utf8.decode(shapesFile.content);
-      final lines = shapesData.split('\n');
-      List<List<String>> shapes = [];
-
-      for (var line in lines) {
-        var fields = line.split(',');
-        shapes.add(fields);
-      }
-
-      List<LatLng> routePoints = [];
-
-      for (int i = 1; i < shapes.length; i++) {
-        var shape = shapes[i];
-        double lat = double.parse(shape[1]);
-        double lon = double.parse(shape[2]);
-        routePoints.add(LatLng(lat, lon));
-      }
-
-      controlsMapProvider.route = routePoints;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final controlsMapProvider = context.watch<ControlsMapProvider>();
@@ -91,12 +52,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             animatedMapController: animatedMapController,
           ),
           Positioned(
-            bottom: 100,
+            bottom: 90,
             right: 20,
             child: FloatingActionButton(
-              onPressed: () => loadGtfsData(context),
+              onPressed: () => animatedMapController.animatedZoomIn(
+                customId: '_useTransformerId',
+              ),
               tooltip: 'Zoom out',
-              child: const Icon(Icons.remove_red_eye),
+              child: const Icon(Icons.zoom_in),
             ),
           ),
           Positioned(

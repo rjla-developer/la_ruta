@@ -112,59 +112,36 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     LatLng? userLocation = controlsMapProvider.userPosition;
     LatLng? destination = controlsMapProvider.targetPosition;
 
-    //Aquí estamos abriendo un archivo que contiene información sobre todas las rutas de autobús.
-    final byteData = await rootBundle.load('assets/gtfs/ruta3_ahuatlan.zip');
-    //Aquí estamos leyendo el archivo.
-    final bytes = byteData.buffer.asUint8List();
-    //Aquí estamos descomprimiendo el archivo, ya que viene en un archivo (.zip).
-    final archive = ZipDecoder().decodeBytes(bytes);
-    //Aquí estamos buscando el archivo que contiene la información de las rutas de autobús.
-    final stopsFile = archive.findFile('ruta3_ahuatlan/stops.txt');
-
     List closeStopFromOrigin = [];
     List closeStopFromDestination = [];
 
-    if (stopsFile != null) {
-      //Aquí estamos leyendo el contenido del archivo.
-      final stopsData = utf8.decode(stopsFile.content);
-      //Aquí estamos dividiendo el contenido del archivo en líneas, ya que el archivo 'stops.txt', es un archivo de texto que contiene varias líneas de datos.
-      final splitByLinesStopData = stopsData.split('\n');
-      //Aquí estamos creando una lista vacía que contendrá todas las formas de las rutas de autobús.
-      List<List<String>> stopsInfo = [];
-      const double limitDistance = 1000.0;
-      double closestStopDistance = double.infinity;
-      double closestRouteDistance = double.infinity;
+    const double limitDistance = 1000.0;
+    double closestStopDistance = double.infinity;
+    double closestRouteDistance = double.infinity;
 
-      for (int i = 0; i < splitByLinesStopData.length; i++) {
-        //Aquí estamos dividiendo cada línea en campos.
-        var fields = splitByLinesStopData[i].split(',');
-        if (i > 0) {
-          var fieldCoordinates =
-              LatLng(double.parse(fields[2]), double.parse(fields[3]));
-          var distanceUserToNextStop =
-              calculateDistance(userLocation!, fieldCoordinates);
-          var distanceDestinationToNextStop =
-              calculateDistance(destination!, fieldCoordinates);
+    for (int i = 0; i < controlsMapProvider.stopsInfo.length; i++) {
+      if (i > 0) {
+        var fieldCoordinates = LatLng(
+            double.parse(controlsMapProvider.stopsInfo[i][2]),
+            double.parse(controlsMapProvider.stopsInfo[i][3]));
+        var distanceUserToNextStop =
+            calculateDistance(userLocation!, fieldCoordinates);
+        var distanceDestinationToNextStop =
+            calculateDistance(destination!, fieldCoordinates);
 
-          if (distanceUserToNextStop < closestStopDistance) {
-            //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario.
-            closeStopFromOrigin = fields;
-            //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario.
-            closestStopDistance = distanceUserToNextStop;
-          }
-
-          if (distanceDestinationToNextStop < closestRouteDistance) {
-            //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario.
-            closeStopFromDestination = fields;
-            //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario.
-            closestRouteDistance = distanceDestinationToNextStop;
-          }
+        if (distanceUserToNextStop < closestStopDistance) {
+          //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario.
+          closeStopFromOrigin = controlsMapProvider.stopsInfo[i];
+          //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario.
+          closestStopDistance = distanceUserToNextStop;
         }
 
-        //Aquí estamos agregando los campos de cada línea a la lista de formas de las rutas de autobús.
-        //En este caso no se necesita pero en el futuro quiero mostrar todas las paradas de las rutas en el mapa.
-        //Esa variable tendra toda la informacion de las paradas de las rutas de autobus.
-        stopsInfo.add(fields);
+        if (distanceDestinationToNextStop < closestRouteDistance) {
+          //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario.
+          closeStopFromDestination = controlsMapProvider.stopsInfo[i];
+          //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario.
+          closestRouteDistance = distanceDestinationToNextStop;
+        }
       }
 
       // Si no hay rutas cerca del destino del usuario, informa al usuario
