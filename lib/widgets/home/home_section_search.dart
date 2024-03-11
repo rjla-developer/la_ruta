@@ -143,18 +143,16 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
           closestRouteDistance = distanceDestinationToNextStop;
         }
       }
-
-      // Si no hay rutas cerca del destino del usuario, informa al usuario
-      if (closestRouteDistance > limitDistance) {
-        print('No hay rutas cerca de tu destino.');
-      } else {
-        controlsMapProvider.setCloseStopFromOrigin(closeStopFromOrigin);
-        controlsMapProvider
-            .setCloseStopFromDestination(closeStopFromDestination);
-        print('La parada más cercana a ti está en: $closeStopFromOrigin');
-        print(
-            'La ruta más cercana a tu destino está en: $closeStopFromDestination');
-      }
+    }
+    // Si no hay rutas cerca del destino del usuario, informa al usuario
+    if (closestRouteDistance > limitDistance) {
+      print('No hay rutas cerca de tu destino.');
+    } else {
+      controlsMapProvider.setCloseStopFromOrigin(closeStopFromOrigin);
+      controlsMapProvider.setCloseStopFromDestination(closeStopFromDestination);
+      print('La parada más cercana a ti está en: $closeStopFromOrigin');
+      print(
+          'La ruta más cercana a tu destino está en: $closeStopFromDestination');
     }
   }
 
