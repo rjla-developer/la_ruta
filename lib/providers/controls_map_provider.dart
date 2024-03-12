@@ -15,6 +15,22 @@ import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'dart:async';
 
+class Shape {
+  final String shapeId;
+  final double lat;
+  final double lon;
+  final int sequence;
+  final LatLng coordinates;
+
+  Shape(this.shapeId, this.lat, this.lon, this.sequence)
+      : coordinates = LatLng(lat, lon);
+
+  @override
+  String toString() {
+    return '$coordinates';
+  }
+}
+
 class ControlsMapProvider extends ChangeNotifier {
   LatLng? _userPosition;
   LatLng? _targetPosition;
@@ -22,7 +38,8 @@ class ControlsMapProvider extends ChangeNotifier {
   List? _closeStopFromOrigin; //Posiblemente se quite
   List? _closeStopFromDestination; //Posiblemente se quite
   final List<LatLng> _route = [];
-  List<List<String>> _stopsInfo = [];
+  final List<List<String>> _stopsInfo = [];
+  final Map<String, List<Shape>> _shapesInfo = {};
 
 //Getters:
   LatLng? get userPosition => _userPosition;
@@ -33,6 +50,7 @@ class ControlsMapProvider extends ChangeNotifier {
       _closeStopFromDestination; //Posiblemente se quite
   List<LatLng> get route => _route;
   List<List<String>> get stopsInfo => _stopsInfo;
+  Map<String, List<Shape>> get shapesMap => _shapesInfo;
 
 //Setters:
   Future<void> _setUserPosition() async {
@@ -90,15 +108,17 @@ class ControlsMapProvider extends ChangeNotifier {
     notifyListeners();
   } //Posiblemente se quite
 
-  Future<void> _getStopsInfo() async {
+  Future<void> _getDataGTFS() async {
     //Aquí estamos abriendo un archivo que contiene información sobre todas las rutas de autobús.
     final byteData = await rootBundle.load('assets/gtfs/ruta3_ahuatlan.zip');
     //Aquí estamos leyendo el archivo.
     final bytes = byteData.buffer.asUint8List();
     //Aquí estamos descomprimiendo el archivo, ya que viene en un archivo (.zip).
     final archive = ZipDecoder().decodeBytes(bytes);
+
     //Aquí estamos buscando el archivo que contiene la información de las rutas de autobús.
     final stopsFile = archive.findFile('ruta3_ahuatlan/stops.txt');
+    final shapesFile = archive.findFile('ruta3_ahuatlan/shapes.txt');
 
     if (stopsFile != null) {
       //Aquí estamos leyendo el contenido del archivo.
@@ -116,14 +136,50 @@ class ControlsMapProvider extends ChangeNotifier {
         _stopsInfo.add(fields);
       }
     }
+
+    if (shapesFile != null) {
+      //Aquí estamos leyendo el contenido del archivo.
+      final shapesData = utf8.decode(shapesFile.content);
+      //Aquí estamos dividiendo el contenido del archivo en líneas, ya que el archivo 'shapes.txt', es un archivo de texto que contiene varias líneas de datos.
+      final splitByLinesShapesData = shapesData.split('\n');
+
+      for (int i = 0; i < splitByLinesShapesData.length; i++) {
+        //Aquí estamos dividiendo cada línea en campos.
+        var fields = splitByLinesShapesData[i].split(',');
+
+        if (fields.length >= 4) {
+          if (_isNumeric(fields[1]) && _isNumeric(fields[2])) {
+            var shape = Shape(fields[0], double.parse(fields[1]),
+                double.parse(fields[2]), int.parse(fields[3]));
+
+            if (!shapesMap.containsKey(shape.shapeId)) {
+              shapesMap[shape.shapeId] = [];
+              /* print('shapeId: ${shape.shapeId}'); */
+            }
+            shapesMap[shape.shapeId]?.add(shape);
+          }
+        } else {
+          print('La línea ${i + 1} tiene menos de 4 campos.');
+        }
+      }
+    }
+
+    print('shapesMap: $shapesMap');
+  }
+
+  bool _isNumeric(String s) {
+    if (s == null) {
+      return false;
+    }
+    return double.tryParse(s) != null;
   }
 
   ControlsMapProvider() {
     _setUserPosition().catchError((error) {
       print('Ocurrió un error al determinar la posición: $error');
     });
-    _getStopsInfo().catchError((error) {
-      print('Ocurrió un error al obtener las paradas: $error');
+    _getDataGTFS().catchError((error) {
+      print('Ocurrió un error con el archivo GTFS: $error');
     });
   }
 }
