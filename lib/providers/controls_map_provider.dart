@@ -15,22 +15,6 @@ import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'dart:async';
 
-class Shape {
-  final String shapeId;
-  final double lat;
-  final double lon;
-  final int sequence;
-  final LatLng coordinates;
-
-  Shape(this.shapeId, this.lat, this.lon, this.sequence)
-      : coordinates = LatLng(lat, lon);
-
-  @override
-  String toString() {
-    return '$coordinates';
-  }
-}
-
 class ControlsMapProvider extends ChangeNotifier {
   LatLng? _userPosition;
   LatLng? _targetPosition;
@@ -39,7 +23,7 @@ class ControlsMapProvider extends ChangeNotifier {
   List? _closeStopFromDestination; //Posiblemente se quite
   final List<LatLng> _route = [];
   final List<List<String>> _stopsInfo = [];
-  final Map<String, List<Shape>> _shapesInfo = {};
+  final Map<String, List<LatLng>> _shapesInfo = {};
 
 //Getters:
   LatLng? get userPosition => _userPosition;
@@ -50,7 +34,7 @@ class ControlsMapProvider extends ChangeNotifier {
       _closeStopFromDestination; //Posiblemente se quite
   List<LatLng> get route => _route;
   List<List<String>> get stopsInfo => _stopsInfo;
-  Map<String, List<Shape>> get shapesMap => _shapesInfo;
+  Map<String, List<LatLng>> get shapesInfo => _shapesInfo;
 
 //Setters:
   Future<void> _setUserPosition() async {
@@ -126,7 +110,8 @@ class ControlsMapProvider extends ChangeNotifier {
       //Aquí estamos dividiendo el contenido del archivo en líneas, ya que el archivo 'stops.txt', es un archivo de texto que contiene varias líneas de datos.
       final splitByLinesStopData = stopsData.split('\n');
 
-      for (int i = 0; i < splitByLinesStopData.length; i++) {
+      for (int i = 1; i < splitByLinesStopData.length; i++) {
+        //El 0 es el encabezado por eso empezamos en 1
         //Aquí estamos dividiendo cada línea en campos.
         var fields = splitByLinesStopData[i].split(',');
 
@@ -135,6 +120,7 @@ class ControlsMapProvider extends ChangeNotifier {
         //Esa variable tendra toda la informacion de las paradas de las rutas de autobus.
         _stopsInfo.add(fields);
       }
+      /* print('stopsInfo: $_stopsInfo'); */
     }
 
     if (shapesFile != null) {
@@ -147,24 +133,19 @@ class ControlsMapProvider extends ChangeNotifier {
         //Aquí estamos dividiendo cada línea en campos.
         var fields = splitByLinesShapesData[i].split(',');
 
-        if (fields.length >= 4) {
-          if (_isNumeric(fields[1]) && _isNumeric(fields[2])) {
-            var shape = Shape(fields[0], double.parse(fields[1]),
-                double.parse(fields[2]), int.parse(fields[3]));
+        if (_isNumeric(fields[1]) && _isNumeric(fields[2])) {
+          var coordinates =
+              LatLng(double.parse(fields[1]), double.parse(fields[2]));
 
-            if (!shapesMap.containsKey(shape.shapeId)) {
-              shapesMap[shape.shapeId] = [];
-              /* print('shapeId: ${shape.shapeId}'); */
-            }
-            shapesMap[shape.shapeId]?.add(shape);
+          if (_shapesInfo.containsKey(fields[0])) {
+            _shapesInfo[fields[0]]?.add(coordinates);
+          } else {
+            _shapesInfo[fields[0]] = [coordinates];
           }
-        } else {
-          print('La línea ${i + 1} tiene menos de 4 campos.');
         }
       }
+      /* print('shapesMap: $_shapesInfo'); */
     }
-
-    print('shapesMap: $shapesMap');
   }
 
   bool _isNumeric(String s) {

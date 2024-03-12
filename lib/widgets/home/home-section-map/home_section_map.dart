@@ -74,7 +74,7 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                         );
                       },
                     ),
-                  for (int i = 1; i < controlsMapProvider.stopsInfo.length; i++)
+                  /* for (int i = 0; i < controlsMapProvider.stopsInfo.length; i++)
                     AnimatedMarker(
                       point: LatLng(
                           double.parse(controlsMapProvider.stopsInfo[i][2]),
@@ -87,7 +87,7 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                           color: const Color.fromARGB(255, 164, 188, 213),
                         );
                       },
-                    ),
+                    ), */
                   if (controlsMapProvider.closeStopFromOrigin != null)
                     AnimatedMarker(
                       point: LatLng(
