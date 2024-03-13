@@ -112,44 +112,78 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     LatLng? userLocation = controlsMapProvider.userPosition;
     LatLng? destination = controlsMapProvider.targetPosition;
 
-    List closeStopFromOrigin = [];
-    List closeStopFromDestination = [];
+    List closeStopFromOriginData = [];
+    List closeStopFromDestinationData = [];
 
     const double limitDistance = 1000.0;
     double closestStopDistance = double.infinity;
     double closestRouteDistance = double.infinity;
 
     for (int i = 0; i < controlsMapProvider.dataGTFS!.stopsInfo.length; i++) {
-      if (i > 0) {
-        var fieldCoordinates = LatLng(
-            double.parse(controlsMapProvider.dataGTFS!.stopsInfo[i][2]),
-            double.parse(controlsMapProvider.dataGTFS!.stopsInfo[i][3]));
-        var distanceUserToNextStop =
-            calculateDistance(userLocation!, fieldCoordinates);
-        var distanceDestinationToNextStop =
-            calculateDistance(destination!, fieldCoordinates);
+      var fieldCoordinates = LatLng(
+          double.parse(controlsMapProvider.dataGTFS!.stopsInfo[i][2]),
+          double.parse(controlsMapProvider.dataGTFS!.stopsInfo[i][3]));
+      var distanceUserToNextStop =
+          calculateDistance(userLocation!, fieldCoordinates);
+      var distanceDestinationToNextStop =
+          calculateDistance(destination!, fieldCoordinates);
 
-        if (distanceUserToNextStop < closestStopDistance) {
-          //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario.
-          closeStopFromOrigin = controlsMapProvider.dataGTFS!.stopsInfo[i];
-          //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario.
-          closestStopDistance = distanceUserToNextStop;
-        }
+      if (distanceUserToNextStop < closestStopDistance) {
+        //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario.
+        closeStopFromOriginData = controlsMapProvider.dataGTFS!.stopsInfo[i];
+        //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario.
+        closestStopDistance = distanceUserToNextStop;
+      }
 
-        if (distanceDestinationToNextStop < closestRouteDistance) {
-          //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario.
-          closeStopFromDestination = controlsMapProvider.dataGTFS!.stopsInfo[i];
-          //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario.
-          closestRouteDistance = distanceDestinationToNextStop;
-        }
+      if (distanceDestinationToNextStop < closestRouteDistance) {
+        //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario.
+        closeStopFromDestinationData =
+            controlsMapProvider.dataGTFS!.stopsInfo[i];
+        //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario.
+        closestRouteDistance = distanceDestinationToNextStop;
       }
     }
     // Si no hay rutas cerca del destino del usuario, informa al usuario
     if (closestRouteDistance > limitDistance) {
       print('No hay rutas cerca de tu destino.');
     } else {
-      print(
-          'La ruta más cercana a tu destino está en: $closeStopFromDestination');
+      Map<String, List<LatLng>> shapesInfo =
+          controlsMapProvider.dataGTFS!.shapesInfo;
+
+      final LatLng closeStopFromOriginCoordinates = LatLng(
+          double.parse(closeStopFromOriginData[2]),
+          double.parse(closeStopFromOriginData[3]));
+
+      final LatLng closeStopFromDestinationCoordinates = LatLng(
+          double.parse(closeStopFromDestinationData[2]),
+          double.parse(closeStopFromDestinationData[3]));
+
+      Map<String, List<LatLng>> routeToDestination =
+          shapesInfo.map((key, value) {
+        bool foundOrigin = false;
+        List<LatLng> route = [];
+        String routeId = '';
+        for (int i = 0; i < value.length; i++) {
+          if (value[i] == closeStopFromOriginCoordinates) {
+            foundOrigin = true;
+          }
+          if (foundOrigin) {
+            route.add(value[i]);
+          }
+          if (value[i] == closeStopFromDestinationCoordinates) {
+            routeId = key;
+            break;
+          }
+        }
+        return MapEntry(routeId, route);
+      });
+
+      routeToDestination
+          .removeWhere((key, value) => key == '' || value.isEmpty);
+
+      print('Ruta más cercana a tu destino: $routeToDestination');
+
+      /* controlsMapProvider.route = routeToDestination['Ahuatlan']; */
     }
   }
 
