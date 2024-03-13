@@ -16,14 +16,25 @@ import 'package:archive/archive.dart';
 import 'dart:async';
 
 class GTFS {
-  List<List<String>> stopsInfo;
-  Map<String, List<LatLng>> shapesInfo;
+  final List<List<String>> _stopsInfo;
+  final Map<String, List<LatLng>> _shapesInfo;
 
-  GTFS(this.stopsInfo, this.shapesInfo);
+  GTFS(
+      {required List<List<String>> stopsInfo,
+      required Map<String, List<LatLng>> shapesInfo})
+      : assert(
+            stopsInfo.isNotEmpty, 'La lista de paradas no puede estar vacía.'),
+        assert(
+            shapesInfo.isNotEmpty, 'La lista de formas no puede estar vacía.'),
+        _stopsInfo = stopsInfo,
+        _shapesInfo = shapesInfo;
+
+  get stopsInfo => _stopsInfo;
+  get shapesInfo => _shapesInfo;
 
   @override
   String toString() {
-    return 'GTFS(stopsInfo: $stopsInfo, shapesInfo: $shapesInfo)';
+    return 'GTFS(stopsInfo: $_stopsInfo, shapesInfo: $_shapesInfo)';
   }
 }
 
@@ -158,7 +169,7 @@ class ControlsMapProvider extends ChangeNotifier {
     if (stopsInfo.isEmpty || shapesInfo.isEmpty) {
       return Future.error('No se encontró información en el archivo GTFS.');
     } else {
-      _dataGTFS = GTFS(stopsInfo, shapesInfo);
+      _dataGTFS = GTFS(stopsInfo: stopsInfo, shapesInfo: shapesInfo);
     }
   }
 
