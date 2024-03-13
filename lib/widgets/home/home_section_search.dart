@@ -119,11 +119,11 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     double closestStopDistance = double.infinity;
     double closestRouteDistance = double.infinity;
 
-    for (int i = 0; i < controlsMapProvider.stopsInfo.length; i++) {
+    for (int i = 0; i < controlsMapProvider.dataGTFS!.stopsInfo.length; i++) {
       if (i > 0) {
         var fieldCoordinates = LatLng(
-            double.parse(controlsMapProvider.stopsInfo[i][2]),
-            double.parse(controlsMapProvider.stopsInfo[i][3]));
+            double.parse(controlsMapProvider.dataGTFS!.stopsInfo[i][2]),
+            double.parse(controlsMapProvider.dataGTFS!.stopsInfo[i][3]));
         var distanceUserToNextStop =
             calculateDistance(userLocation!, fieldCoordinates);
         var distanceDestinationToNextStop =
@@ -131,14 +131,14 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
 
         if (distanceUserToNextStop < closestStopDistance) {
           //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario.
-          closeStopFromOrigin = controlsMapProvider.stopsInfo[i];
+          closeStopFromOrigin = controlsMapProvider.dataGTFS!.stopsInfo[i];
           //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario.
           closestStopDistance = distanceUserToNextStop;
         }
 
         if (distanceDestinationToNextStop < closestRouteDistance) {
           //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario.
-          closeStopFromDestination = controlsMapProvider.stopsInfo[i];
+          closeStopFromDestination = controlsMapProvider.dataGTFS!.stopsInfo[i];
           //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario.
           closestRouteDistance = distanceDestinationToNextStop;
         }
