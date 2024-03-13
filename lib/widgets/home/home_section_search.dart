@@ -183,7 +183,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
 
       print('Ruta más cercana a tu destino: $routeToDestination');
 
-      /* controlsMapProvider.route = routeToDestination['Ahuatlan']; */
+      controlsMapProvider.posiblesRoutesToDestination = routeToDestination;
     }
   }
 

@@ -32,6 +32,7 @@ class ControlsMapProvider extends ChangeNotifier {
   LatLng? _targetPosition;
   final PanelController _panelController = PanelController();
   final List<LatLng> _route = [];
+  final Map<String, List<LatLng>> _posiblesRoutesToDestination = {};
   GTFS? _dataGTFS;
 
 //Getters:
@@ -39,6 +40,8 @@ class ControlsMapProvider extends ChangeNotifier {
   LatLng? get targetPosition => _targetPosition;
   PanelController get panelController => _panelController;
   List<LatLng> get route => _route;
+  Map<String, List<LatLng>> get posiblesRoutesToDestination =>
+      _posiblesRoutesToDestination;
   GTFS? get dataGTFS => _dataGTFS;
 
 //Setters:
@@ -88,6 +91,13 @@ class ControlsMapProvider extends ChangeNotifier {
   }
 
   Future<void> _getDataGTFS() async {
+    bool _isNumeric(String s) {
+      if (s == null) {
+        return false;
+      }
+      return double.tryParse(s) != null;
+    }
+
     final List<List<String>> stopsInfo = [];
     final Map<String, List<LatLng>> shapesInfo = {};
 
@@ -152,11 +162,10 @@ class ControlsMapProvider extends ChangeNotifier {
     }
   }
 
-  bool _isNumeric(String s) {
-    if (s == null) {
-      return false;
-    }
-    return double.tryParse(s) != null;
+  set posiblesRoutesToDestination(Map<String, List<LatLng>> value) {
+    _posiblesRoutesToDestination.clear();
+    _posiblesRoutesToDestination.addAll(value);
+    notifyListeners();
   }
 
   ControlsMapProvider() {

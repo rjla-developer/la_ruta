@@ -3,8 +3,14 @@ import "package:flutter/material.dart";
 //Functions:
 import "package:la_ruta/utils/get_routes.dart";
 
+//Latlong2:
+import "package:latlong2/latlong.dart";
+
 class ItemOptionRoute extends StatefulWidget {
-  const ItemOptionRoute({super.key});
+  final String nameRoute;
+  final List<LatLng> value;
+  const ItemOptionRoute(
+      {super.key, required this.nameRoute, required this.value});
 
   @override
   State<ItemOptionRoute> createState() => _ItemOptionRouteState();
@@ -18,77 +24,73 @@ class _ItemOptionRouteState extends State<ItemOptionRoute> {
       borderRadius: const BorderRadius.all(Radius.circular(12.0)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12.0),
-        onTap: () {
-          getRoute(context);
-        },
-        child: const Padding(
-          padding: EdgeInsets.all(10.0),
+        onTap: () => getRoute(context, widget.value),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
           child: Row(
             children: [
-              Image(
+              const Image(
                 image: NetworkImage(
                   'https://queruta.mx/wp-content/uploads/2023/10/5.png',
                 ),
                 width: 100,
                 height: 80,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
-              Flexible(
-                child: Material(
-                  color: Colors.transparent,
-                  child: Column(
-                    children: [
-                      Text(
-                        'Dirección:',
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
+              Material(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    const Text(
+                      'Dirección:',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                    Text(
+                      widget.nameRoute,
+                      style: const TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Text(
+                      'Tiempo estimado al destino:',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 2,
+                    ),
+                    const Row(
+                      children: [
+                        Icon(
+                          Icons.timer,
+                          size: 12.0,
+                          color: Colors.black,
                         ),
-                        textAlign: TextAlign.left,
-                      ),
-                      Text(
-                        'Santa María - Buena vista - Calera',
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
+                        SizedBox(
+                          width: 2,
                         ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        'Tiempo estimado al destino:',
-                        style: TextStyle(
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          '50 minutos',
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.timer,
-                            size: 12.0,
-                            color: Colors.black,
-                          ),
-                          SizedBox(
-                            width: 2,
-                          ),
-                          Text(
-                            '50 minutos',
-                            style: TextStyle(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],

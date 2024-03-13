@@ -1,5 +1,11 @@
 import "package:flutter/material.dart";
 
+//Provider:
+import "package:provider/provider.dart";
+
+//Providers:
+import "package:la_ruta/providers/controls_map_provider.dart";
+
 //Widgets:
 import "package:la_ruta/widgets/home/home-section-panel/item_option_route.dart";
 
@@ -8,6 +14,7 @@ class HomeSectionPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controlsMapProvider = context.watch<ControlsMapProvider>();
     return Container(
       decoration: const BoxDecoration(
         color: Color.fromARGB(255, 255, 255, 255),
@@ -39,11 +46,18 @@ class HomeSectionPanel extends StatelessWidget {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.only(left: 10, right: 10),
-              children: const [
-                ItemOptionRoute(),
-                SizedBox(
-                  height: 20,
-                ),
+              children: [
+                ...controlsMapProvider.posiblesRoutesToDestination.entries
+                    .expand((entry) {
+                  String nameRoute = entry.key;
+                  var value = entry.value;
+                  return [
+                    ItemOptionRoute(nameRoute: nameRoute, value: value),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  ];
+                }).toList(),
               ],
             ),
           ),
