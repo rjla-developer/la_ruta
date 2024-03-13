@@ -15,6 +15,18 @@ import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'dart:async';
 
+class GTFS {
+  List<List<String>> stopsInfo;
+  Map<String, List<LatLng>> shapesInfo;
+
+  GTFS(this.stopsInfo, this.shapesInfo);
+
+  @override
+  String toString() {
+    return 'GTFS(stopsInfo: $stopsInfo, shapesInfo: $shapesInfo)';
+  }
+}
+
 class ControlsMapProvider extends ChangeNotifier {
   LatLng? _userPosition;
   LatLng? _targetPosition;
@@ -22,8 +34,7 @@ class ControlsMapProvider extends ChangeNotifier {
   List? _closeStopFromOrigin; //Posiblemente se quite
   List? _closeStopFromDestination; //Posiblemente se quite
   final List<LatLng> _route = [];
-  final List<List<String>> _stopsInfo = [];
-  final Map<String, List<LatLng>> _shapesInfo = {};
+  GTFS? _dataGTFS;
 
 //Getters:
   LatLng? get userPosition => _userPosition;
@@ -33,8 +44,7 @@ class ControlsMapProvider extends ChangeNotifier {
   List? get closeStopFromDestination =>
       _closeStopFromDestination; //Posiblemente se quite
   List<LatLng> get route => _route;
-  List<List<String>> get stopsInfo => _stopsInfo;
-  Map<String, List<LatLng>> get shapesInfo => _shapesInfo;
+  GTFS? get dataGTFS => _dataGTFS;
 
 //Setters:
   Future<void> _setUserPosition() async {
@@ -93,6 +103,9 @@ class ControlsMapProvider extends ChangeNotifier {
   } //Posiblemente se quite
 
   Future<void> _getDataGTFS() async {
+    final List<List<String>> stopsInfo = [];
+    final Map<String, List<LatLng>> shapesInfo = {};
+
     //Aquí estamos abriendo un archivo que contiene información sobre todas las rutas de autobús.
     final byteData = await rootBundle.load('assets/gtfs/ruta3_ahuatlan.zip');
     //Aquí estamos leyendo el archivo.
@@ -118,9 +131,9 @@ class ControlsMapProvider extends ChangeNotifier {
         //Aquí estamos agregando los campos de cada línea a la lista de formas de las rutas de autobús.
         //En este caso no se necesita pero en el futuro quiero mostrar todas las paradas de las rutas en el mapa.
         //Esa variable tendra toda la informacion de las paradas de las rutas de autobus.
-        _stopsInfo.add(fields);
+        stopsInfo.add(fields);
       }
-      /* print('stopsInfo: $_stopsInfo'); */
+      /* print('stopsInfo: $stopsInfo'); */
     }
 
     if (shapesFile != null) {
@@ -137,14 +150,20 @@ class ControlsMapProvider extends ChangeNotifier {
           var coordinates =
               LatLng(double.parse(fields[1]), double.parse(fields[2]));
 
-          if (_shapesInfo.containsKey(fields[0])) {
-            _shapesInfo[fields[0]]?.add(coordinates);
+          if (shapesInfo.containsKey(fields[0])) {
+            shapesInfo[fields[0]]?.add(coordinates);
           } else {
-            _shapesInfo[fields[0]] = [coordinates];
+            shapesInfo[fields[0]] = [coordinates];
           }
         }
       }
-      /* print('shapesMap: $_shapesInfo'); */
+      /* print('shapesMap: $shapesInfo'); */
+    }
+
+    if (stopsInfo.isEmpty || shapesInfo.isEmpty) {
+      return Future.error('No se encontró información en el archivo GTFS.');
+    } else {
+      _dataGTFS = GTFS(stopsInfo, shapesInfo);
     }
   }
 
