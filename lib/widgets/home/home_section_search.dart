@@ -148,9 +148,6 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     if (closestRouteDistance > limitDistance) {
       print('No hay rutas cerca de tu destino.');
     } else {
-      controlsMapProvider.setCloseStopFromOrigin(closeStopFromOrigin);
-      controlsMapProvider.setCloseStopFromDestination(closeStopFromDestination);
-      print('La parada más cercana a ti está en: $closeStopFromOrigin');
       print(
           'La ruta más cercana a tu destino está en: $closeStopFromDestination');
     }

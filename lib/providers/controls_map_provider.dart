@@ -31,8 +31,6 @@ class ControlsMapProvider extends ChangeNotifier {
   LatLng? _userPosition;
   LatLng? _targetPosition;
   final PanelController _panelController = PanelController();
-  List? _closeStopFromOrigin; //Posiblemente se quite
-  List? _closeStopFromDestination; //Posiblemente se quite
   final List<LatLng> _route = [];
   GTFS? _dataGTFS;
 
@@ -40,9 +38,6 @@ class ControlsMapProvider extends ChangeNotifier {
   LatLng? get userPosition => _userPosition;
   LatLng? get targetPosition => _targetPosition;
   PanelController get panelController => _panelController;
-  List? get closeStopFromOrigin => _closeStopFromOrigin; //Posiblemente se quite
-  List? get closeStopFromDestination =>
-      _closeStopFromDestination; //Posiblemente se quite
   List<LatLng> get route => _route;
   GTFS? get dataGTFS => _dataGTFS;
 
@@ -91,16 +86,6 @@ class ControlsMapProvider extends ChangeNotifier {
     _route.addAll(value);
     notifyListeners();
   }
-
-  void setCloseStopFromOrigin(List value) {
-    _closeStopFromOrigin = value;
-    notifyListeners();
-  } //Posiblemente se quite
-
-  void setCloseStopFromDestination(List value) {
-    _closeStopFromDestination = value;
-    notifyListeners();
-  } //Posiblemente se quite
 
   Future<void> _getDataGTFS() async {
     final List<List<String>> stopsInfo = [];

@@ -93,38 +93,6 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                           );
                         },
                       ), */
-                  if (controlsMapProvider.closeStopFromOrigin != null)
-                    AnimatedMarker(
-                      point: LatLng(
-                          double.parse(
-                              controlsMapProvider.closeStopFromOrigin?[2]),
-                          double.parse(
-                              controlsMapProvider.closeStopFromOrigin?[3])),
-                      builder: (_, animation) {
-                        final size = 50.0 * animation.value;
-                        return Icon(
-                          Icons.flag_circle_rounded,
-                          size: size,
-                          color: const Color.fromARGB(255, 19, 70, 124),
-                        );
-                      },
-                    ),
-                  if (controlsMapProvider.closeStopFromDestination != null)
-                    AnimatedMarker(
-                      point: LatLng(
-                          double.parse(
-                              controlsMapProvider.closeStopFromDestination?[2]),
-                          double.parse(controlsMapProvider
-                              .closeStopFromDestination?[3])),
-                      builder: (_, animation) {
-                        final size = 50.0 * animation.value;
-                        return Icon(
-                          Icons.flag_circle_rounded,
-                          size: size,
-                          color: const Color.fromARGB(255, 19, 70, 124),
-                        );
-                      },
-                    ),
                 ],
               ),
               /* AnimatedMarker(
