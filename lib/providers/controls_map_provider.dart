@@ -102,7 +102,7 @@ class ControlsMapProvider extends ChangeNotifier {
   }
 
   Future<void> _getDataGTFS() async {
-    bool _isNumeric(String s) {
+    bool isNumeric(String s) {
       if (s == null) {
         return false;
       }
@@ -152,7 +152,7 @@ class ControlsMapProvider extends ChangeNotifier {
         //Aquí estamos dividiendo cada línea en campos.
         var fields = splitByLinesShapesData[i].split(',');
 
-        if (_isNumeric(fields[1]) && _isNumeric(fields[2])) {
+        if (isNumeric(fields[1]) && isNumeric(fields[2])) {
           var coordinates =
               LatLng(double.parse(fields[1]), double.parse(fields[2]));
 
