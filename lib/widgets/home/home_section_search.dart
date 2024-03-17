@@ -16,6 +16,7 @@ import 'package:latlong2/latlong.dart';
 //Providers:
 import 'package:provider/provider.dart';
 import 'package:la_ruta/providers/controls_map_provider.dart';
+import 'package:la_ruta/providers/gtfs_provider.dart';
 
 //FlutterMapAnimations:
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -58,7 +59,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
   }
 
   Future<void> getDestinationCoordinates(
-      controlsMapProvider, locationId) async {
+      controlsMapProvider, gtfsProvider, locationId) async {
     var url = Uri.https(
         'api.mapbox.com', '/search/searchbox/v1/retrieve/$locationId', {
       'access_token': searchLocationAccessToken,
@@ -91,7 +92,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
       rotation: 0,
       customId: '_useTransformerId',
     );
-    getOptionsRoutes(controlsMapProvider);
+    getOptionsRoutes(controlsMapProvider, gtfsProvider);
   }
 
   double calculateDistance(LatLng point1, LatLng point2) {
@@ -108,21 +109,20 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     return R * c;
   }
 
-  void getOptionsRoutes(controlsMapProvider) async {
+  void getOptionsRoutes(controlsMapProvider, gtfsProvider) async {
     LatLng? userLocation = controlsMapProvider.userPosition;
     LatLng? destination = controlsMapProvider.targetPosition;
 
-    List closeStopFromOriginData = [];
-    List closeStopFromDestinationData = [];
+    Stop? closestStopFromOriginData;
+    Stop? closestStopFromDestinationData;
 
     const double limitDistance = 1000.0;
     double closestStopDistance = double.infinity;
     double closestRouteDistance = double.infinity;
 
-    for (int i = 0; i < controlsMapProvider.dataGTFS!.stopsInfo.length; i++) {
-      var fieldCoordinates = LatLng(
-          double.parse(controlsMapProvider.dataGTFS!.stopsInfo[i][2]),
-          double.parse(controlsMapProvider.dataGTFS!.stopsInfo[i][3]));
+    for (int i = 0; i < gtfsProvider.dataGTFS!.stopsInfo.length; i++) {
+      var fieldCoordinates = LatLng(gtfsProvider.dataGTFS!.stopsInfo[i].stopLat,
+          gtfsProvider.dataGTFS!.stopsInfo[i].stopLon);
       var distanceUserToNextStop =
           calculateDistance(userLocation!, fieldCoordinates);
       var distanceDestinationToNextStop =
@@ -130,15 +130,14 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
 
       if (distanceUserToNextStop < closestStopDistance) {
         //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario.
-        closeStopFromOriginData = controlsMapProvider.dataGTFS!.stopsInfo[i];
+        closestStopFromOriginData = gtfsProvider.dataGTFS!.stopsInfo[i];
         //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario.
         closestStopDistance = distanceUserToNextStop;
       }
 
       if (distanceDestinationToNextStop < closestRouteDistance) {
         //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario.
-        closeStopFromDestinationData =
-            controlsMapProvider.dataGTFS!.stopsInfo[i];
+        closestStopFromDestinationData = gtfsProvider.dataGTFS!.stopsInfo[i];
         //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario.
         closestRouteDistance = distanceDestinationToNextStop;
       }
@@ -147,16 +146,52 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     if (closestRouteDistance > limitDistance) {
       print('No hay rutas cerca de tu destino.');
     } else {
-      Map<String, List<LatLng>> shapesInfo =
+      /* print('Parada más cercana al origen: $closestStopFromOriginData');
+      print('Parada más cercana al destino: $closestStopFromDestinationData'); */
+
+      List<BusStop> busStopsInfo = gtfsProvider.dataGTFS!.busStopsInfo;
+      List<BusStop> busesWithClosestStopFromOrigin = busStopsInfo
+          .where(
+              (element) => element.stopId == closestStopFromOriginData!.stopId)
+          .toList();
+      List<BusStop> busesWithClosestStopFromDestination = busStopsInfo
+          .where((element) =>
+              element.stopId == closestStopFromDestinationData!.stopId)
+          .toList();
+
+      List<List<BusStop>> idsDirectBusesToDestination = [];
+
+      /* print('$busesWithClosestStopFromOrigin');
+      print('$busesWithClosestStopFromDestination'); */
+
+      for (int i = 0; i < busesWithClosestStopFromOrigin.length; i++) {
+        for (int j = 0; j < busesWithClosestStopFromDestination.length; j++) {
+          if (busesWithClosestStopFromOrigin[i].routeId ==
+              busesWithClosestStopFromDestination[j].routeId) {
+            idsDirectBusesToDestination.add([
+              busesWithClosestStopFromOrigin[i],
+              busesWithClosestStopFromDestination[j]
+            ]);
+          }
+        }
+      }
+
+      print(
+          'Buses que llevan al usuario directamente sin tomar escalas: $idsDirectBusesToDestination');
+
+      /* List<Shape> shapesInfo = gtfsProvider.dataGTFS!.shapesInfo;
+      List<LatLng> shapesCoordinates = []; */
+
+      /* Map<String, List<LatLng>> shapesInfo =
           controlsMapProvider.dataGTFS!.shapesInfo;
 
       final LatLng closeStopFromOriginCoordinates = LatLng(
-          double.parse(closeStopFromOriginData[2]),
-          double.parse(closeStopFromOriginData[3]));
+          double.parse(closestStopFromOriginData[2]),
+          double.parse(closestStopFromOriginData[3]));
 
       final LatLng closeStopFromDestinationCoordinates = LatLng(
-          double.parse(closeStopFromDestinationData[2]),
-          double.parse(closeStopFromDestinationData[3]));
+          double.parse(closestStopFromDestinationData[2]),
+          double.parse(closestStopFromDestinationData[3]));
 
       Map<String, List<LatLng>> routeToDestination =
           shapesInfo.map((key, value) {
@@ -183,13 +218,14 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
 
       print('Ruta más cercana a tu destino: $routeToDestination');
 
-      controlsMapProvider.posiblesRoutesToDestination = routeToDestination;
+      controlsMapProvider.posiblesRoutesToDestination = routeToDestination; */
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final controlsMapProvider = context.watch<ControlsMapProvider>();
+    final gtfsProvider = context.watch<GTFSProvider>();
     return Stack(children: [
       if (_showModalSearch) ...[
         Positioned(
@@ -216,9 +252,10 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                                 setState(() {
                                   controllerResponseInputSearch.text =
                                       responseLocations[i]['name'];
-                                  getDestinationCoordinates(controlsMapProvider,
+                                  getDestinationCoordinates(
+                                      controlsMapProvider,
+                                      gtfsProvider,
                                       responseLocations[i]['mapbox_id']);
-
                                   _showModalSearch = false;
                                 });
                               },
