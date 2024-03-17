@@ -12,6 +12,7 @@ import 'package:latlong2/latlong.dart';
 //Providers:
 import 'package:provider/provider.dart';
 import 'package:la_ruta/providers/controls_map_provider.dart';
+import 'package:la_ruta/providers/gtfs_provider.dart';
 
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
@@ -31,6 +32,7 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
   @override
   Widget build(BuildContext context) {
     final controlsMapProvider = context.watch<ControlsMapProvider>();
+    final gtfsProvider = context.watch<GTFSProvider>();
 
     return controlsMapProvider.userPosition != null
         ? FlutterMap(
@@ -74,20 +76,18 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                         );
                       },
                     ),
-                  /* if (controlsMapProvider.dataGTFS != null)
+                  /* if (gtfsProvider.dataGTFS != null)
                     for (int i = 0;
-                        i < controlsMapProvider.dataGTFS!.stopsInfo.length;
+                        i < gtfsProvider.dataGTFS!.stopsInfo.length;
                         i++)
                       AnimatedMarker(
                         point: LatLng(
-                            double.parse(
-                                controlsMapProvider.dataGTFS!.stopsInfo[i][2]),
-                            double.parse(
-                                controlsMapProvider.dataGTFS!.stopsInfo[i][3])),
+                            gtfsProvider.dataGTFS!.stopsInfo[i].stopLat,
+                            gtfsProvider.dataGTFS!.stopsInfo[i].stopLon),
                         builder: (_, animation) {
-                          final size = 50.0 * animation.value;
+                          final size = 25.0 * animation.value;
                           return Icon(
-                            Icons.flag,
+                            Icons.pin_drop,
                             size: size,
                             color: const Color.fromARGB(255, 164, 188, 213),
                           );
