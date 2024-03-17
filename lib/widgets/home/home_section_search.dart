@@ -159,16 +159,17 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
               element.stopId == closestStopFromDestinationData!.stopId)
           .toList();
 
-      List<List<BusStop>> idsDirectBusesToDestination = [];
-
       /* print('$busesWithClosestStopFromOrigin');
       print('$busesWithClosestStopFromDestination'); */
+
+      List<List<BusStop>> directBusesToDestination = [];
+      List<Shape> shapesInfo = gtfsProvider.dataGTFS!.shapesInfo;
 
       for (int i = 0; i < busesWithClosestStopFromOrigin.length; i++) {
         for (int j = 0; j < busesWithClosestStopFromDestination.length; j++) {
           if (busesWithClosestStopFromOrigin[i].routeId ==
               busesWithClosestStopFromDestination[j].routeId) {
-            idsDirectBusesToDestination.add([
+            directBusesToDestination.add([
               busesWithClosestStopFromOrigin[i],
               busesWithClosestStopFromDestination[j]
             ]);
@@ -177,10 +178,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
       }
 
       print(
-          'Buses que llevan al usuario directamente sin tomar escalas: $idsDirectBusesToDestination');
-
-      /* List<Shape> shapesInfo = gtfsProvider.dataGTFS!.shapesInfo;
-      List<LatLng> shapesCoordinates = []; */
+          'Buses que llevan al usuario directamente sin tomar escalas: $directBusesToDestination');
 
       /* Map<String, List<LatLng>> shapesInfo =
           controlsMapProvider.dataGTFS!.shapesInfo;
