@@ -120,9 +120,10 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     double closestStopDistance = double.infinity;
     double closestRouteDistance = double.infinity;
 
-    for (int i = 0; i < gtfsProvider.dataGTFS!.stopsInfo.length; i++) {
-      var fieldCoordinates = LatLng(gtfsProvider.dataGTFS!.stopsInfo[i].stopLat,
-          gtfsProvider.dataGTFS!.stopsInfo[i].stopLon);
+    List<Stop> stopsInfo = gtfsProvider.dataGTFS!.stopsInfo;
+
+    for (int i = 0; i < stopsInfo.length; i++) {
+      var fieldCoordinates = LatLng(stopsInfo[i].stopLat, stopsInfo[i].stopLon);
       var distanceUserToNextStop =
           calculateDistance(userLocation!, fieldCoordinates);
       var distanceDestinationToNextStop =
@@ -130,14 +131,14 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
 
       if (distanceUserToNextStop < closestStopDistance) {
         //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario.
-        closestStopFromOriginData = gtfsProvider.dataGTFS!.stopsInfo[i];
+        closestStopFromOriginData = stopsInfo[i];
         //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario.
         closestStopDistance = distanceUserToNextStop;
       }
 
       if (distanceDestinationToNextStop < closestRouteDistance) {
         //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario.
-        closestStopFromDestinationData = gtfsProvider.dataGTFS!.stopsInfo[i];
+        closestStopFromDestinationData = stopsInfo[i];
         //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario.
         closestRouteDistance = distanceDestinationToNextStop;
       }
@@ -162,61 +163,72 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
       /* print('$busesWithClosestStopFromOrigin');
       print('$busesWithClosestStopFromDestination'); */
 
-      List<List<BusStop>> directBusesToDestination = [];
+      //Determinar microbuses directos al destino:
       List<Shape> shapesInfo = gtfsProvider.dataGTFS!.shapesInfo;
+      Map<double, List<LatLng>> routeToDestination = {};
 
+      //Esta lógica une a los microbuses con el 'routeId' identicos que tienen paradas cercanas al origen y al destino del usuario.
+      //Específicamente en el if unimos a los microbuses
       for (int i = 0; i < busesWithClosestStopFromOrigin.length; i++) {
         for (int j = 0; j < busesWithClosestStopFromDestination.length; j++) {
           if (busesWithClosestStopFromOrigin[i].routeId ==
               busesWithClosestStopFromDestination[j].routeId) {
-            directBusesToDestination.add([
-              busesWithClosestStopFromOrigin[i],
-              busesWithClosestStopFromDestination[j]
-            ]);
+            LatLng? coordinatesBusWithClosestStopFromOrigin;
+            LatLng? coordinatesBusWithClosestStopFromDestination;
+
+            for (var element in stopsInfo) {
+              if (element.stopId == busesWithClosestStopFromOrigin[i].stopId) {
+                coordinatesBusWithClosestStopFromOrigin =
+                    LatLng(element.stopLat, element.stopLon);
+              }
+              if (element.stopId ==
+                  busesWithClosestStopFromDestination[j].stopId) {
+                coordinatesBusWithClosestStopFromDestination =
+                    LatLng(element.stopLat, element.stopLon);
+              }
+            }
+
+            if (!routeToDestination
+                .containsKey(busesWithClosestStopFromOrigin[i].routeId)) {
+              routeToDestination[busesWithClosestStopFromOrigin[i].routeId] = [
+                coordinatesBusWithClosestStopFromOrigin!
+              ];
+            }
+
+            /* print('Ruta directa: $directBusesToDestination'); */
+
+            for (int k = 0; k < shapesInfo.length; k++) {
+              if (shapesInfo[k].shapeId ==
+                  busesWithClosestStopFromOrigin[i].routeId) {
+                LatLng shapeCoordinates =
+                    LatLng(shapesInfo[k].shapePtLat, shapesInfo[k].shapePtLon);
+
+                if (busesWithClosestStopFromDestination[j].stopSequence >
+                        shapesInfo[k].stopSequence &&
+                    shapesInfo[k].stopSequence >
+                        busesWithClosestStopFromOrigin[i].stopSequence) {
+                  if (routeToDestination
+                      .containsKey(busesWithClosestStopFromOrigin[i].routeId)) {
+                    routeToDestination[
+                            busesWithClosestStopFromOrigin[i].routeId]!
+                        .add(shapeCoordinates);
+                  }
+                }
+              }
+            }
+
+            if (routeToDestination
+                .containsKey(busesWithClosestStopFromOrigin[i].routeId)) {
+              routeToDestination[busesWithClosestStopFromOrigin[i].routeId]!
+                  .add(coordinatesBusWithClosestStopFromDestination!);
+            }
           }
         }
       }
+      /* print('$routeToDestination'); */
 
-      print(
-          'Buses que llevan al usuario directamente sin tomar escalas: $directBusesToDestination');
-
-      /* Map<String, List<LatLng>> shapesInfo =
-          controlsMapProvider.dataGTFS!.shapesInfo;
-
-      final LatLng closeStopFromOriginCoordinates = LatLng(
-          double.parse(closestStopFromOriginData[2]),
-          double.parse(closestStopFromOriginData[3]));
-
-      final LatLng closeStopFromDestinationCoordinates = LatLng(
-          double.parse(closestStopFromDestinationData[2]),
-          double.parse(closestStopFromDestinationData[3]));
-
-      Map<String, List<LatLng>> routeToDestination =
-          shapesInfo.map((key, value) {
-        bool foundOrigin = false;
-        List<LatLng> route = [];
-        String routeId = '';
-        for (int i = 0; i < value.length; i++) {
-          if (value[i] == closeStopFromOriginCoordinates) {
-            foundOrigin = true;
-          }
-          if (foundOrigin) {
-            route.add(value[i]);
-          }
-          if (value[i] == closeStopFromDestinationCoordinates) {
-            routeId = key;
-            break;
-          }
-        }
-        return MapEntry(routeId, route);
-      });
-
-      routeToDestination
-          .removeWhere((key, value) => key == '' || value.isEmpty);
-
-      print('Ruta más cercana a tu destino: $routeToDestination');
-
-      controlsMapProvider.posiblesRoutesToDestination = routeToDestination; */
+      controlsMapProvider.posiblesRoutesToDestination = routeToDestination
+          .map((key, value) => MapEntry(key.toString(), value));
     }
   }
 
