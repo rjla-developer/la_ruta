@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 //Dart:
 import 'dart:convert';
-import 'package:archive/archive.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -96,16 +94,29 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
   }
 
   double calculateDistance(LatLng point1, LatLng point2) {
-    const R = 6371e3; // Esto es el radio de la Tierra en metros
+    /* Este código es una implementación de la fórmula de Haversine
+    para calcular la distancia entre dos puntos en la superficie
+    de una esfera (en este caso, la Tierra) dadas sus
+    latitudes y longitudes. Aquí está la explicación línea por línea. */
+
+    // Esto es el radio de la Tierra en metros:
+    const R = 6371e3;
+    //Aquí se convierte la latitud del primer punto de grados a radianes:
     var lat1 = point1.latitude * pi / 180;
+    //Aquí se convierte la latitud del segundo punto de grados a radianes:
     var lat2 = point2.latitude * pi / 180;
+    //Aquí se calcula la diferencia en latitud entre los dos puntos y se convierte de grados a radianes:
     var deltaLat = (point2.latitude - point1.latitude) * pi / 180;
+    //Aquí se calcula la diferencia en longitud entre los dos puntos y se convierte de grados a radianes:
     var deltaLon = (point2.longitude - point1.longitude) * pi / 180;
 
+    //Aquí se calcula el valor de a en la fórmula de Haversine:
     var a = sin(deltaLat / 2) * sin(deltaLat / 2) +
         cos(lat1) * cos(lat2) * sin(deltaLon / 2) * sin(deltaLon / 2);
+    //Aquí se calcula el valor de c en la fórmula de Haversine:
     var c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
+    //Finalmente, se devuelve la distancia entre los dos puntos, que se calcula multiplicando R (el radio de la Tierra) por c:
     return R * c;
   }
 
@@ -130,16 +141,16 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
           calculateDistance(destination!, fieldCoordinates);
 
       if (distanceUserToNextStop < closestStopDistance) {
-        //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario.
+        //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario:
         closestStopFromOriginData = stopsInfo[i];
-        //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario.
+        //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario:
         closestStopDistance = distanceUserToNextStop;
       }
 
       if (distanceDestinationToNextStop < closestRouteDistance) {
-        //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario.
+        //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario:
         closestStopFromDestinationData = stopsInfo[i];
-        //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario.
+        //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario:
         closestRouteDistance = distanceDestinationToNextStop;
       }
     }
@@ -147,9 +158,6 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     if (closestRouteDistance > limitDistance) {
       print('No hay rutas cerca de tu destino.');
     } else {
-      /* print('Parada más cercana al origen: $closestStopFromOriginData');
-      print('Parada más cercana al destino: $closestStopFromDestinationData'); */
-
       List<BusStop> busStopsInfo = gtfsProvider.dataGTFS!.busStopsInfo;
       List<BusStop> busesWithClosestStopFromOrigin = busStopsInfo
           .where(
@@ -160,72 +168,52 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
               element.stopId == closestStopFromDestinationData!.stopId)
           .toList();
 
-      /* print('$busesWithClosestStopFromOrigin');
-      print('$busesWithClosestStopFromDestination'); */
-
       //Determinar microbuses directos al destino:
       List<Shape> shapesInfo = gtfsProvider.dataGTFS!.shapesInfo;
       Map<double, List<LatLng>> routeToDestination = {};
 
-      //Esta lógica une a los microbuses con el 'routeId' identicos que tienen paradas cercanas al origen y al destino del usuario.
-      //Específicamente en el if unimos a los microbuses
-      for (int i = 0; i < busesWithClosestStopFromOrigin.length; i++) {
-        for (int j = 0; j < busesWithClosestStopFromDestination.length; j++) {
-          if (busesWithClosestStopFromOrigin[i].routeId ==
-              busesWithClosestStopFromDestination[j].routeId) {
-            LatLng? coordinatesBusWithClosestStopFromOrigin;
-            LatLng? coordinatesBusWithClosestStopFromDestination;
+      /* Esta lógica une a los microbuses con el 'routeId' identicos que 
+      tienen paradas cercanas al origen y al destino del usuario. */
 
-            for (var element in stopsInfo) {
-              if (element.stopId == busesWithClosestStopFromOrigin[i].stopId) {
-                coordinatesBusWithClosestStopFromOrigin =
-                    LatLng(element.stopLat, element.stopLon);
-              }
-              if (element.stopId ==
-                  busesWithClosestStopFromDestination[j].stopId) {
-                coordinatesBusWithClosestStopFromDestination =
-                    LatLng(element.stopLat, element.stopLon);
-              }
-            }
+      //Este es el inicio de un bucle que recorre cada microbus en la lista busesWithClosestStopFromOrigin:
+      for (var busFromOrigin in busesWithClosestStopFromOrigin) {
+        //Dentro del bucle anterior, este es otro bucle que recorre cada microbus en la lista busesWithClosestStopFromDestination:
+        for (var busFromDestination in busesWithClosestStopFromDestination) {
+          //En este if uno a los microbuses!, es una condición que verifica si el routeId del microbus desde el ORIGEN es igual al routeId del microbus desde el DESTINO:
+          if (busFromOrigin.routeId == busFromDestination.routeId) {
+            /* firstWhere es un método de las listas en Dart que te permite buscar el primer elemento que cumple con una condición específica. */
 
-            if (!routeToDestination
-                .containsKey(busesWithClosestStopFromOrigin[i].routeId)) {
-              routeToDestination[busesWithClosestStopFromOrigin[i].routeId] = [
-                coordinatesBusWithClosestStopFromOrigin!
-              ];
-            }
+            var stopFromOrigin = stopsInfo
+                .firstWhere((stop) => stop.stopId == busFromOrigin.stopId);
+            //En este caso, busco la primera parada en stopsInfo que tenga el mismo stopId que el stopId del microbus desde el origen.
+            var stopFromDestination = stopsInfo
+                .firstWhere((stop) => stop.stopId == busFromDestination.stopId);
 
-            /* print('Ruta directa: $directBusesToDestination'); */
+            LatLng coordinatesBusWithClosestStopFromOrigin =
+                LatLng(stopFromOrigin.stopLat, stopFromOrigin.stopLon);
+            LatLng coordinatesBusWithClosestStopFromDestination = LatLng(
+                stopFromDestination.stopLat, stopFromDestination.stopLon);
 
-            for (int k = 0; k < shapesInfo.length; k++) {
-              if (shapesInfo[k].shapeId ==
-                  busesWithClosestStopFromOrigin[i].routeId) {
+            /* putIfAbsent es un método que toma dos argumentos: una clave y una función que genera un valor. */
+            routeToDestination.putIfAbsent(busFromOrigin.routeId,
+                () => [coordinatesBusWithClosestStopFromOrigin]);
+
+            for (var shape in shapesInfo) {
+              if (shape.shapeId == busFromOrigin.routeId &&
+                  busFromDestination.stopSequence > shape.stopSequence &&
+                  shape.stopSequence > busFromOrigin.stopSequence) {
                 LatLng shapeCoordinates =
-                    LatLng(shapesInfo[k].shapePtLat, shapesInfo[k].shapePtLon);
-
-                if (busesWithClosestStopFromDestination[j].stopSequence >
-                        shapesInfo[k].stopSequence &&
-                    shapesInfo[k].stopSequence >
-                        busesWithClosestStopFromOrigin[i].stopSequence) {
-                  if (routeToDestination
-                      .containsKey(busesWithClosestStopFromOrigin[i].routeId)) {
-                    routeToDestination[
-                            busesWithClosestStopFromOrigin[i].routeId]!
-                        .add(shapeCoordinates);
-                  }
-                }
+                    LatLng(shape.shapePtLat, shape.shapePtLon);
+                routeToDestination[busFromOrigin.routeId]
+                    ?.add(shapeCoordinates);
               }
             }
 
-            if (routeToDestination
-                .containsKey(busesWithClosestStopFromOrigin[i].routeId)) {
-              routeToDestination[busesWithClosestStopFromOrigin[i].routeId]!
-                  .add(coordinatesBusWithClosestStopFromDestination!);
-            }
+            routeToDestination[busFromOrigin.routeId]
+                ?.add(coordinatesBusWithClosestStopFromDestination);
           }
         }
       }
-      /* print('$routeToDestination'); */
 
       controlsMapProvider.posiblesRoutesToDestination = routeToDestination
           .map((key, value) => MapEntry(key.toString(), value));
