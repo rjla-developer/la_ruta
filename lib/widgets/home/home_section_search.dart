@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+
+//Dart:
 import 'dart:convert';
 import 'dart:async';
+import 'dart:math';
 
 //Http:
 import 'package:http/http.dart' as http;
@@ -11,6 +14,7 @@ import 'package:latlong2/latlong.dart';
 //Providers:
 import 'package:provider/provider.dart';
 import 'package:la_ruta/providers/controls_map_provider.dart';
+import 'package:la_ruta/providers/gtfs_provider.dart';
 
 //FlutterMapAnimations:
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -52,7 +56,8 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     setState(() => responseLocations = jsonData['suggestions']);
   }
 
-  Future<void> getCoordinates(controlsMapProvider, locationId) async {
+  Future<void> getDestinationCoordinates(
+      controlsMapProvider, gtfsProvider, locationId) async {
     var url = Uri.https(
         'api.mapbox.com', '/search/searchbox/v1/retrieve/$locationId', {
       'access_token': searchLocationAccessToken,
@@ -85,11 +90,140 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
       rotation: 0,
       customId: '_useTransformerId',
     );
+    getOptionsRoutes(controlsMapProvider, gtfsProvider);
+  }
+
+  double calculateDistance(LatLng point1, LatLng point2) {
+    /* Este código es una implementación de la fórmula de Haversine
+    para calcular la distancia entre dos puntos en la superficie
+    de una esfera (en este caso, la Tierra) dadas sus
+    latitudes y longitudes. Aquí está la explicación línea por línea. */
+
+    // Esto es el radio de la Tierra en metros:
+    const R = 6371e3;
+    //Aquí se convierte la latitud del primer punto de grados a radianes:
+    var lat1 = point1.latitude * pi / 180;
+    //Aquí se convierte la latitud del segundo punto de grados a radianes:
+    var lat2 = point2.latitude * pi / 180;
+    //Aquí se calcula la diferencia en latitud entre los dos puntos y se convierte de grados a radianes:
+    var deltaLat = (point2.latitude - point1.latitude) * pi / 180;
+    //Aquí se calcula la diferencia en longitud entre los dos puntos y se convierte de grados a radianes:
+    var deltaLon = (point2.longitude - point1.longitude) * pi / 180;
+
+    //Aquí se calcula el valor de a en la fórmula de Haversine:
+    var a = sin(deltaLat / 2) * sin(deltaLat / 2) +
+        cos(lat1) * cos(lat2) * sin(deltaLon / 2) * sin(deltaLon / 2);
+    //Aquí se calcula el valor de c en la fórmula de Haversine:
+    var c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    //Finalmente, se devuelve la distancia entre los dos puntos, que se calcula multiplicando R (el radio de la Tierra) por c:
+    return R * c;
+  }
+
+  void getOptionsRoutes(controlsMapProvider, gtfsProvider) async {
+    LatLng? userLocation = controlsMapProvider.userPosition;
+    LatLng? destination = controlsMapProvider.targetPosition;
+
+    Stop? closestStopFromOriginData;
+    Stop? closestStopFromDestinationData;
+
+    const double limitDistance = 1000.0;
+    double closestStopDistance = double.infinity;
+    double closestRouteDistance = double.infinity;
+
+    List<Stop> stopsInfo = gtfsProvider.dataGTFS!.stopsInfo;
+
+    for (int i = 0; i < stopsInfo.length; i++) {
+      var fieldCoordinates = LatLng(stopsInfo[i].stopLat, stopsInfo[i].stopLon);
+      var distanceUserToNextStop =
+          calculateDistance(userLocation!, fieldCoordinates);
+      var distanceDestinationToNextStop =
+          calculateDistance(destination!, fieldCoordinates);
+
+      if (distanceUserToNextStop < closestStopDistance) {
+        //Aquí estamos actualizando los datos de la parada más cercana al origen del usuario:
+        closestStopFromOriginData = stopsInfo[i];
+        //Aquí estamos actualizando la distancia más corta de la parada más cercana al origen del usuario:
+        closestStopDistance = distanceUserToNextStop;
+      }
+
+      if (distanceDestinationToNextStop < closestRouteDistance) {
+        //Aquí estamos actualizando los datos de la parada más cercana al destino del usuario:
+        closestStopFromDestinationData = stopsInfo[i];
+        //Aquí estamos actualizando la distancia más corta de la parada más cercana del destino del usuario:
+        closestRouteDistance = distanceDestinationToNextStop;
+      }
+    }
+    // Si no hay rutas cerca del destino del usuario, informa al usuario
+    if (closestRouteDistance > limitDistance) {
+      print('No hay rutas cerca de tu destino.');
+    } else {
+      List<BusStop> busStopsInfo = gtfsProvider.dataGTFS!.busStopsInfo;
+      List<BusStop> busesWithClosestStopFromOrigin = busStopsInfo
+          .where(
+              (element) => element.stopId == closestStopFromOriginData!.stopId)
+          .toList();
+      List<BusStop> busesWithClosestStopFromDestination = busStopsInfo
+          .where((element) =>
+              element.stopId == closestStopFromDestinationData!.stopId)
+          .toList();
+
+      //Determinar microbuses directos al destino:
+      List<Shape> shapesInfo = gtfsProvider.dataGTFS!.shapesInfo;
+      Map<double, List<LatLng>> routeToDestination = {};
+
+      /* Esta lógica une a los microbuses con el 'routeId' identicos que 
+      tienen paradas cercanas al origen y al destino del usuario. */
+
+      //Este es el inicio de un bucle que recorre cada microbus en la lista busesWithClosestStopFromOrigin:
+      for (var busFromOrigin in busesWithClosestStopFromOrigin) {
+        //Dentro del bucle anterior, este es otro bucle que recorre cada microbus en la lista busesWithClosestStopFromDestination:
+        for (var busFromDestination in busesWithClosestStopFromDestination) {
+          //En este if uno a los microbuses!, es una condición que verifica si el routeId del microbus desde el ORIGEN es igual al routeId del microbus desde el DESTINO:
+          if (busFromOrigin.routeId == busFromDestination.routeId) {
+            /* firstWhere es un método de las listas en Dart que te permite buscar el primer elemento que cumple con una condición específica. */
+
+            var stopFromOrigin = stopsInfo
+                .firstWhere((stop) => stop.stopId == busFromOrigin.stopId);
+            //En este caso, busco la primera parada en stopsInfo que tenga el mismo stopId que el stopId del microbus desde el origen.
+            var stopFromDestination = stopsInfo
+                .firstWhere((stop) => stop.stopId == busFromDestination.stopId);
+
+            LatLng coordinatesBusWithClosestStopFromOrigin =
+                LatLng(stopFromOrigin.stopLat, stopFromOrigin.stopLon);
+            LatLng coordinatesBusWithClosestStopFromDestination = LatLng(
+                stopFromDestination.stopLat, stopFromDestination.stopLon);
+
+            /* putIfAbsent es un método que toma dos argumentos: una clave y una función que genera un valor. */
+            routeToDestination.putIfAbsent(busFromOrigin.routeId,
+                () => [coordinatesBusWithClosestStopFromOrigin]);
+
+            for (var shape in shapesInfo) {
+              if (shape.shapeId == busFromOrigin.routeId &&
+                  busFromDestination.stopSequence > shape.stopSequence &&
+                  shape.stopSequence > busFromOrigin.stopSequence) {
+                LatLng shapeCoordinates =
+                    LatLng(shape.shapePtLat, shape.shapePtLon);
+                routeToDestination[busFromOrigin.routeId]
+                    ?.add(shapeCoordinates);
+              }
+            }
+
+            routeToDestination[busFromOrigin.routeId]
+                ?.add(coordinatesBusWithClosestStopFromDestination);
+          }
+        }
+      }
+
+      controlsMapProvider.posiblesRoutesToDestination = routeToDestination
+          .map((key, value) => MapEntry(key.toString(), value));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final controlsMapProvider = context.watch<ControlsMapProvider>();
+    final gtfsProvider = context.watch<GTFSProvider>();
     return Stack(children: [
       if (_showModalSearch) ...[
         Positioned(
@@ -116,7 +250,9 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                                 setState(() {
                                   controllerResponseInputSearch.text =
                                       responseLocations[i]['name'];
-                                  getCoordinates(controlsMapProvider,
+                                  getDestinationCoordinates(
+                                      controlsMapProvider,
+                                      gtfsProvider,
                                       responseLocations[i]['mapbox_id']);
                                   _showModalSearch = false;
                                 });

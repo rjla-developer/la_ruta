@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 //Widgets:
 import 'package:la_ruta/widgets/home/home-section-map/home_section_map.dart';
 import 'package:la_ruta/widgets/home/home_section_search.dart';
-import 'package:la_ruta/widgets/home/home_section_panel.dart';
-
-//Functions:
-/* import 'package:la_ruta/utils/get_routes.dart'; */
+import 'package:la_ruta/widgets/home/home-section-panel/home_section_panel.dart';
 
 //FlutterMapAnimations:
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -53,6 +50,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           ),
           HomeSectionSearch(
             animatedMapController: animatedMapController,
+          ),
+          Positioned(
+            bottom: 90,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () => animatedMapController.animatedZoomIn(
+                customId: '_useTransformerId',
+              ),
+              tooltip: 'Zoom out',
+              child: const Icon(Icons.zoom_in),
+            ),
           ),
           Positioned(
             bottom: 20,

@@ -9,17 +9,25 @@ import 'package:geolocator/geolocator.dart';
 //SlidingUpPanel:
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+//Dart:
+import 'dart:async';
+
 class ControlsMapProvider extends ChangeNotifier {
   LatLng? _userPosition;
   LatLng? _targetPosition;
   final PanelController _panelController = PanelController();
   final List<LatLng> _route = [];
+  final Map<String, List<LatLng>> _posiblesRoutesToDestination = {};
 
+//Getters:
   LatLng? get userPosition => _userPosition;
   LatLng? get targetPosition => _targetPosition;
   PanelController get panelController => _panelController;
   List<LatLng> get route => _route;
+  Map<String, List<LatLng>> get posiblesRoutesToDestination =>
+      _posiblesRoutesToDestination;
 
+//Setters:
   Future<void> _setUserPosition() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -60,15 +68,20 @@ class ControlsMapProvider extends ChangeNotifier {
   }
 
   set route(List<LatLng> value) {
-    print(value);
     _route.clear();
     _route.addAll(value);
     notifyListeners();
   }
 
+  set posiblesRoutesToDestination(Map<String, List<LatLng>> value) {
+    _posiblesRoutesToDestination.clear();
+    _posiblesRoutesToDestination.addAll(value);
+    notifyListeners();
+  }
+
   ControlsMapProvider() {
     _setUserPosition().catchError((error) {
-      /* print('Ocurrió un error al determinar la posición: $error'); */
+      print('Ocurrió un error al determinar la posición: $error');
     });
   }
 }
