@@ -21,11 +21,6 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (_) => const Home()));
-    });
   }
 
   @override
@@ -37,6 +32,15 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final controlsMapProvider = context.watch<ControlsMapProvider>();
+
+    if (controlsMapProvider.userPosition != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context)
+            .pushReplacement(MaterialPageRoute(builder: (_) => const Home()));
+      });
+    }
+
     return const Scaffold(
       body: Center(
         child: Image(
