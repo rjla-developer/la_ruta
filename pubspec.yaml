@@ -34,6 +34,7 @@ flutter:
 
   assets:
     - assets/gtfs/ruta3_ahuatlan.zip
+    - assets/images/loading-la-ruta.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

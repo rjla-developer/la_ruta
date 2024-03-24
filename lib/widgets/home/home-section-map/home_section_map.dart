@@ -20,9 +20,9 @@ const mapboxAccessToken =
 class HomeSectionMap extends StatefulWidget {
   final AnimatedMapController animatedMapController;
   const HomeSectionMap({
-    Key? key,
+    super.key,
     required this.animatedMapController,
-  }) : super(key: key);
+  });
 
   @override
   State<HomeSectionMap> createState() => _HomeSectionMapState();
@@ -34,49 +34,48 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
     final controlsMapProvider = context.watch<ControlsMapProvider>();
     final gtfsProvider = context.watch<GTFSProvider>();
 
-    return controlsMapProvider.userPosition != null
-        ? FlutterMap(
-            mapController: widget.animatedMapController.mapController,
-            options: MapOptions(
-              initialCenter: controlsMapProvider.userPosition!,
-              initialZoom: 17,
-              maxZoom: 22,
-              minZoom: 9.5,
+    return FlutterMap(
+      mapController: widget.animatedMapController.mapController,
+      options: MapOptions(
+        initialCenter: controlsMapProvider.userPosition!,
+        initialZoom: 17,
+        maxZoom: 22,
+        minZoom: 9.5,
+      ),
+      children: [
+        TileLayer(
+          urlTemplate:
+              "https://api.mapbox.com/styles/v1/rj-developer/clsgye3i303gv01o88gzf40sf/tiles/256/{z}/{x}/{y}@2x?access_token=$mapboxAccessToken",
+          additionalOptions: const {
+            'accessToken': mapboxAccessToken,
+          },
+        ),
+        AnimatedMarkerLayer(
+          markers: [
+            AnimatedMarker(
+              point: controlsMapProvider.userPosition!,
+              builder: (_, animation) {
+                final size = 50.0 * animation.value;
+                return Icon(
+                  Icons.person_pin,
+                  size: size,
+                  color: const Color.fromARGB(255, 25, 176, 218),
+                );
+              },
             ),
-            children: [
-              TileLayer(
-                urlTemplate:
-                    "https://api.mapbox.com/styles/v1/rj-developer/clsgye3i303gv01o88gzf40sf/tiles/256/{z}/{x}/{y}@2x?access_token=$mapboxAccessToken",
-                additionalOptions: const {
-                  'accessToken': mapboxAccessToken,
+            if (controlsMapProvider.targetPosition != null)
+              AnimatedMarker(
+                point: controlsMapProvider.targetPosition!,
+                builder: (_, animation) {
+                  final size = 50.0 * animation.value;
+                  return Icon(
+                    Icons.location_pin,
+                    size: size,
+                    color: const Color.fromARGB(255, 170, 39, 39),
+                  );
                 },
               ),
-              AnimatedMarkerLayer(
-                markers: [
-                  AnimatedMarker(
-                    point: controlsMapProvider.userPosition!,
-                    builder: (_, animation) {
-                      final size = 50.0 * animation.value;
-                      return Icon(
-                        Icons.person_pin,
-                        size: size,
-                        color: const Color.fromARGB(255, 25, 176, 218),
-                      );
-                    },
-                  ),
-                  if (controlsMapProvider.targetPosition != null)
-                    AnimatedMarker(
-                      point: controlsMapProvider.targetPosition!,
-                      builder: (_, animation) {
-                        final size = 50.0 * animation.value;
-                        return Icon(
-                          Icons.location_pin,
-                          size: size,
-                          color: const Color.fromARGB(255, 170, 39, 39),
-                        );
-                      },
-                    ),
-                  /* if (gtfsProvider.dataGTFS != null)
+            /* if (gtfsProvider.dataGTFS != null)
                     for (int i = 0;
                         i < gtfsProvider.dataGTFS!.stopsInfo.length;
                         i++)
@@ -93,9 +92,9 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                           );
                         },
                       ), */
-                ],
-              ),
-              /* AnimatedMarker(
+          ],
+        ),
+        /* AnimatedMarker(
                         point: const LatLng(18.940714, -99.241622),
                         builder: (_, animation) {
                           final size = 50.0 * animation.value;
@@ -106,17 +105,16 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                           );
                         },
                       ), */
-              PolylineLayer(
-                polylines: [
-                  Polyline(
-                    strokeWidth: 4.0,
-                    points: controlsMapProvider.route,
-                    color: Colors.green,
-                  ),
-                ],
-              ),
-            ],
-          )
-        : const Center(child: CircularProgressIndicator());
+        PolylineLayer(
+          polylines: [
+            Polyline(
+              strokeWidth: 4.0,
+              points: controlsMapProvider.route,
+              color: Colors.green,
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }

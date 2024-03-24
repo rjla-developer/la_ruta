@@ -51,7 +51,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           HomeSectionSearch(
             animatedMapController: animatedMapController,
           ),
-          Positioned(
+          /* Positioned(
             bottom: 90,
             right: 20,
             child: FloatingActionButton(
@@ -72,7 +72,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               tooltip: 'Zoom out',
               child: const Icon(Icons.zoom_out),
             ),
-          ),
+          ), */
         ],
       ),
     );

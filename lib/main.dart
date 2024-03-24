@@ -9,6 +9,7 @@ import 'package:la_ruta/providers/gtfs_provider.dart';
 
 //Screens:
 import 'screens/home.dart';
+import 'screens/splash.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: const Home(),
+        home: const Splash(),
       ),
     );
   }
