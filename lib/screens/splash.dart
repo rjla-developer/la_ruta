@@ -42,13 +42,27 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     }
 
     return const Scaffold(
-      body: Center(
-        child: Image(
-          image: AssetImage('assets/images/loading-la-ruta.png'),
-          width: double.infinity,
-          height: double.infinity,
-          fit: BoxFit.cover,
-        ),
+      body: Stack(
+        children: <Widget>[
+          Center(
+            child: Image(
+              image: AssetImage('assets/images/loading-la-ruta.png'),
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned(
+            bottom: 270,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
