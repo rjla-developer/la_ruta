@@ -22,6 +22,11 @@ import 'package:flutter_map_animations/flutter_map_animations.dart';
 //FlutterMap:
 import 'package:flutter_map/flutter_map.dart';
 
+//Models:
+import 'package:la_ruta/models/providers/gtfs/stop_model.dart';
+import 'package:la_ruta/models/providers/gtfs/bus_stop_model.dart';
+import 'package:la_ruta/models/providers/gtfs/shape_model.dart';
+
 const searchLocationAccessToken =
     "pk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsa3JpOXNudDB2dG8zcXFtN3RqYzk2ZngifQ.OjfZuB4ku290h-qvB-BecA";
 
