@@ -7,25 +7,25 @@ import 'package:archive/archive.dart';
 import 'dart:async';
 
 //Models:
-import 'package:la_ruta/models/providers/gtfs/stop_model.dart';
-import 'package:la_ruta/models/providers/gtfs/bus_stop_model.dart';
-import 'package:la_ruta/models/providers/gtfs/shape_model.dart';
-import 'package:la_ruta/models/providers/gtfs/route_model.dart';
-import 'package:la_ruta/models/providers/gtfs/trip_model.dart';
+import 'package:la_ruta/models/stop_model.dart';
+import 'package:la_ruta/models/bus_stop_model.dart';
+import 'package:la_ruta/models/shape_model.dart';
+import 'package:la_ruta/models/route_model.dart';
+import 'package:la_ruta/models/trip_model.dart';
 
 class GTFS {
-  final List<Stop> _stopsInfo;
-  final List<BusStop> _busStopsInfo;
-  final List<Shape> _shapesInfo;
+  final List<StopModel> _stopsInfo;
+  final List<BusStopModel> _busStopsInfo;
+  final List<ShapeModel> _shapesInfo;
   final List<RouteModel> _routesInfo;
-  final List<Trip> _tripsInfo;
+  final List<TripModel> _tripsInfo;
 
   GTFS(
-      {required List<Stop> stopsInfo,
-      required List<BusStop> busStopsInfo,
-      required List<Shape> shapesInfo,
+      {required List<StopModel> stopsInfo,
+      required List<BusStopModel> busStopsInfo,
+      required List<ShapeModel> shapesInfo,
       required List<RouteModel> routesInfo,
-      required List<Trip> tripsInfo})
+      required List<TripModel> tripsInfo})
       : assert(
             stopsInfo.isNotEmpty, 'La lista de paradas no puede estar vacía.'),
         assert(busStopsInfo.isNotEmpty,
@@ -42,11 +42,11 @@ class GTFS {
         _routesInfo = routesInfo,
         _tripsInfo = tripsInfo;
 
-  List<Stop> get stopsInfo => _stopsInfo;
-  List<BusStop> get busStopsInfo => _busStopsInfo;
-  List<Shape> get shapesInfo => _shapesInfo;
+  List<StopModel> get stopsInfo => _stopsInfo;
+  List<BusStopModel> get busStopsInfo => _busStopsInfo;
+  List<ShapeModel> get shapesInfo => _shapesInfo;
   List<RouteModel> get routesInfo => _routesInfo;
-  List<Trip> get tripsInfo => _tripsInfo;
+  List<TripModel> get tripsInfo => _tripsInfo;
 
   @override
   String toString() {
@@ -91,20 +91,20 @@ class GTFSProvider extends ChangeNotifier {
     final archive = ZipDecoder().decodeBytes(bytes);
 
     final stopsInfo = (await processFile(archive, 'ruta3_ahuatlan/stops.txt'))
-        .map((e) => Stop.fromList(e))
+        .map((e) => StopModel.fromList(e))
         .toList(); //Toda esta linea trata sobre crear una instancia de la clase correspondiente y devolverlo como una lista .
     final busStopsInfo =
         (await processFile(archive, 'ruta3_ahuatlan/bus_stops.txt'))
-            .map((e) => BusStop.fromList(e))
+            .map((e) => BusStopModel.fromList(e))
             .toList();
     final shapesInfo = (await processFile(archive, 'ruta3_ahuatlan/shapes.txt'))
-        .map((e) => Shape.fromList(e))
+        .map((e) => ShapeModel.fromList(e))
         .toList();
     final routesInfo = (await processFile(archive, 'ruta3_ahuatlan/routes.txt'))
         .map((e) => RouteModel.fromList(e))
         .toList();
     final tripsInfo = (await processFile(archive, 'ruta3_ahuatlan/trips.txt'))
-        .map((e) => Trip.fromList(e))
+        .map((e) => TripModel.fromList(e))
         .toList();
 
     if (stopsInfo.isEmpty ||

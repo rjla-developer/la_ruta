@@ -1,17 +1,17 @@
-class Trip {
+class TripModel {
   final String tripId;
   final double routeId;
   final String serviceId;
   final double shapeId;
 
-  Trip(
+  TripModel(
       {required this.tripId,
       required this.routeId,
       required this.serviceId,
       required this.shapeId});
 
-  factory Trip.fromList(List<String> data) {
-    return Trip(
+  factory TripModel.fromList(List<String> data) {
+    return TripModel(
       tripId: data[0],
       routeId: double.parse(data[1]),
       serviceId: data[2],
@@ -21,6 +21,6 @@ class Trip {
 
   @override
   String toString() {
-    return 'Trip(tripId: $tripId, routeId: $routeId, serviceId: $serviceId, shapeId: $shapeId)';
+    return 'TripModel(tripId: $tripId, routeId: $routeId, serviceId: $serviceId, shapeId: $shapeId)';
   }
 }

@@ -1,19 +1,19 @@
-class Shape {
+class ShapeModel {
   final double shapeId;
   final double shapePtLat;
   final double shapePtLon;
   final int shapePtSequence;
   final int stopSequence;
 
-  Shape(
+  ShapeModel(
       {required this.shapeId,
       required this.shapePtLat,
       required this.shapePtLon,
       required this.shapePtSequence,
       required this.stopSequence});
 
-  factory Shape.fromList(List<String> data) {
-    return Shape(
+  factory ShapeModel.fromList(List<String> data) {
+    return ShapeModel(
       shapeId: double.parse(data[0]),
       shapePtLat: double.parse(data[1]),
       shapePtLon: double.parse(data[2]),
@@ -24,6 +24,6 @@ class Shape {
 
   @override
   String toString() {
-    return 'Shape(shapeId: $shapeId, shapePtLat: $shapePtLat, shapePtLon: $shapePtLon, shapePtSequence: $shapePtSequence, stopSequence: $stopSequence)';
+    return 'ShapeModel(shapeId: $shapeId, shapePtLat: $shapePtLat, shapePtLon: $shapePtLon, shapePtSequence: $shapePtSequence, stopSequence: $stopSequence)';
   }
 }

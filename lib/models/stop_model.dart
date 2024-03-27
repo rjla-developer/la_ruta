@@ -1,17 +1,17 @@
-class Stop {
+class StopModel {
   final int stopId;
   final String stopName;
   final double stopLat;
   final double stopLon;
 
-  Stop(
+  StopModel(
       {required this.stopId,
       required this.stopName,
       required this.stopLat,
       required this.stopLon});
 
-  factory Stop.fromList(List<String> data) {
-    return Stop(
+  factory StopModel.fromList(List<String> data) {
+    return StopModel(
       stopId: int.parse(data[0]),
       stopName: data[1],
       stopLat: double.parse(data[2]),
@@ -21,6 +21,6 @@ class Stop {
 
   @override
   String toString() {
-    return 'Stop(stopId: $stopId, stopName: $stopName, stopLat: $stopLat, stopLon: $stopLon)';
+    return 'StopModel(stopId: $stopId, stopName: $stopName, stopLat: $stopLat, stopLon: $stopLon)';
   }
 }

@@ -23,9 +23,9 @@ import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 //Models:
-import 'package:la_ruta/models/providers/gtfs/stop_model.dart';
-import 'package:la_ruta/models/providers/gtfs/bus_stop_model.dart';
-import 'package:la_ruta/models/providers/gtfs/shape_model.dart';
+import 'package:la_ruta/models/stop_model.dart';
+import 'package:la_ruta/models/bus_stop_model.dart';
+import 'package:la_ruta/models/shape_model.dart';
 
 const searchLocationAccessToken =
     "pk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsa3JpOXNudDB2dG8zcXFtN3RqYzk2ZngifQ.OjfZuB4ku290h-qvB-BecA";
@@ -129,14 +129,14 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     LatLng? userLocation = controlsMapProvider.userPosition;
     LatLng? destination = controlsMapProvider.targetPosition;
 
-    Stop? closestStopFromOriginData;
-    Stop? closestStopFromDestinationData;
+    StopModel? closestStopFromOriginData;
+    StopModel? closestStopFromDestinationData;
 
     const double limitDistance = 1000.0;
     double closestStopDistance = double.infinity;
     double closestRouteDistance = double.infinity;
 
-    List<Stop> stopsInfo = gtfsProvider.dataGTFS!.stopsInfo;
+    List<StopModel> stopsInfo = gtfsProvider.dataGTFS!.stopsInfo;
 
     for (int i = 0; i < stopsInfo.length; i++) {
       var fieldCoordinates = LatLng(stopsInfo[i].stopLat, stopsInfo[i].stopLon);
@@ -163,18 +163,18 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     if (closestRouteDistance > limitDistance) {
       print('No hay rutas cerca de tu destino.');
     } else {
-      List<BusStop> busStopsInfo = gtfsProvider.dataGTFS!.busStopsInfo;
-      List<BusStop> busesWithClosestStopFromOrigin = busStopsInfo
+      List<BusStopModel> busStopsInfo = gtfsProvider.dataGTFS!.busStopsInfo;
+      List<BusStopModel> busesWithClosestStopFromOrigin = busStopsInfo
           .where(
               (element) => element.stopId == closestStopFromOriginData!.stopId)
           .toList();
-      List<BusStop> busesWithClosestStopFromDestination = busStopsInfo
+      List<BusStopModel> busesWithClosestStopFromDestination = busStopsInfo
           .where((element) =>
               element.stopId == closestStopFromDestinationData!.stopId)
           .toList();
 
       //Determinar microbuses directos al destino:
-      List<Shape> shapesInfo = gtfsProvider.dataGTFS!.shapesInfo;
+      List<ShapeModel> shapesInfo = gtfsProvider.dataGTFS!.shapesInfo;
       Map<double, List<LatLng>> routeToDestination = {};
 
       /* Esta lógica une a los microbuses con el 'routeId' identicos que 
