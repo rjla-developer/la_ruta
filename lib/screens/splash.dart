@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:la_ruta/providers/controls_map_provider.dart';
 
 //Widgets:
-import 'home.dart';
+import 'package:la_ruta/screens/home_screen.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -36,8 +36,8 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
 
     if (controlsMapProvider.userPosition != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context)
-            .pushReplacement(MaterialPageRoute(builder: (_) => const Home()));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const HomeScreen()));
       });
     }
 

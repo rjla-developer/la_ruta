@@ -18,14 +18,14 @@ import 'package:la_ruta/providers/controls_map_provider.dart';
 const mapboxAccessToken =
     "sk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsc2dkazgzdTFsbjIybG8wMmFtcXVwODMifQ.gJl_3nLWEv_E9SeT6H_PkQ";
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeState extends State<Home> with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late final animatedMapController = AnimatedMapController(vsync: this);
 
   @override
@@ -76,5 +76,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         ],
       ),
     );
+    ;
   }
 }
