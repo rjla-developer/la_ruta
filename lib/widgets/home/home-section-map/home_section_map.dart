@@ -50,6 +50,15 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
             'accessToken': mapboxAccessToken,
           },
         ),
+        PolylineLayer(
+          polylines: [
+            Polyline(
+              strokeWidth: 4.0,
+              points: controlsMapProvider.route,
+              color: Colors.green,
+            ),
+          ],
+        ),
         AnimatedMarkerLayer(
           markers: [
             AnimatedMarker(
@@ -105,15 +114,6 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
                           );
                         },
                       ), */
-        PolylineLayer(
-          polylines: [
-            Polyline(
-              strokeWidth: 4.0,
-              points: controlsMapProvider.route,
-              color: Colors.green,
-            ),
-          ],
-        ),
       ],
     );
   }

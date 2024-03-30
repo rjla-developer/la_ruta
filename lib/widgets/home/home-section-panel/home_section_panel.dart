@@ -5,16 +5,28 @@ import "package:provider/provider.dart";
 
 //Providers:
 import "package:la_ruta/providers/controls_map_provider.dart";
+import "package:la_ruta/providers/gtfs_provider.dart";
 
 //Widgets:
 import "package:la_ruta/widgets/home/home-section-panel/item_option_route.dart";
 
-class HomeSectionPanel extends StatelessWidget {
+//Models:
+import "package:la_ruta/models/route_model.dart";
+import "package:la_ruta/models/possible_route_to_destination_model.dart";
+
+class HomeSectionPanel extends StatefulWidget {
   const HomeSectionPanel({super.key});
 
   @override
+  State<HomeSectionPanel> createState() => _HomeSectionPanelState();
+}
+
+class _HomeSectionPanelState extends State<HomeSectionPanel> {
+  @override
   Widget build(BuildContext context) {
     final controlsMapProvider = context.watch<ControlsMapProvider>();
+    final List<PossibleRouteToDestinationModel> possibleRoutesToDestination =
+        controlsMapProvider.possibleRoutesToDestination;
     return Container(
       decoration: const BoxDecoration(
         color: Color.fromARGB(255, 255, 255, 255),
@@ -47,12 +59,15 @@ class HomeSectionPanel extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.only(left: 10, right: 10),
               children: [
-                ...controlsMapProvider.posiblesRoutesToDestination.entries
-                    .expand((entry) {
-                  String nameRoute = entry.key;
-                  var value = entry.value;
+                ...possibleRoutesToDestination
+                    .expand((possibleRouteToDestination) {
+                  print(
+                      'possibleRouteToDestination: $possibleRouteToDestination');
                   return [
-                    ItemOptionRoute(nameRoute: nameRoute, value: value),
+                    ItemOptionRoute(
+                      nameRoute: possibleRouteToDestination.routeShortName,
+                      value: possibleRouteToDestination.coordinates,
+                    ),
                     const SizedBox(
                       height: 20,
                     ),
