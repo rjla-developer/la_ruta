@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+//FlutterMap:
+import 'package:flutter_map/flutter_map.dart';
+
 //Dart:
 import 'dart:async';
 
@@ -167,6 +170,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                 },
                 onTap: () {
                   controlsMapProvider.panelController.close();
+                  controlsMapProvider.dataPolylineRoute = Polyline(points: []);
                   setState(() => _showModalSearch = true);
                 },
                 decoration: InputDecoration(
@@ -180,6 +184,8 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                     icon: const Icon(Icons.clear),
                     onPressed: () => {
                       controllerResponseInputSearch.clear(),
+                      controlsMapProvider.dataPolylineRoute =
+                          Polyline(points: []),
                       controlsMapProvider.setTargetPosition(const LatLng(0, 0)),
                       setState(() => responseLocations = [])
                     },
