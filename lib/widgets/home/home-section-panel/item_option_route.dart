@@ -1,5 +1,8 @@
 import "package:flutter/material.dart";
 
+//Models:
+import "package:la_ruta/models/possible_route_to_destination_model.dart";
+
 //Functions:
 import "package:la_ruta/utils/get_routes.dart";
 
@@ -7,10 +10,8 @@ import "package:la_ruta/utils/get_routes.dart";
 import "package:latlong2/latlong.dart";
 
 class ItemOptionRoute extends StatefulWidget {
-  final String nameRoute;
-  final List<LatLng> value;
-  const ItemOptionRoute(
-      {super.key, required this.nameRoute, required this.value});
+  final PossibleRouteToDestinationModel data;
+  const ItemOptionRoute({super.key, required this.data});
 
   @override
   State<ItemOptionRoute> createState() => _ItemOptionRouteState();
@@ -19,78 +20,68 @@ class ItemOptionRoute extends StatefulWidget {
 class _ItemOptionRouteState extends State<ItemOptionRoute> {
   @override
   Widget build(BuildContext context) {
+    Color colorRoute = widget.data.colorRoute;
+    List<LatLng> coordinates = widget.data.coordinates;
+    double routeId = widget.data.routeId;
+    String routeShortName = widget.data.routeShortName;
+    String routeLongName = widget.data.routeLongName;
+
     return Material(
       color: Colors.grey[300],
       borderRadius: const BorderRadius.all(Radius.circular(12.0)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12.0),
-        onTap: () => getRoute(context, widget.value),
+        onTap: () => getRoute(context, coordinates, colorRoute),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Row(
             children: [
-              const Image(
-                image: NetworkImage(
-                  'https://queruta.mx/wp-content/uploads/2023/10/5.png',
-                ),
+              Image(
+                image: AssetImage(routeId == 3.0
+                    ? 'assets/images/ruta_3.png'
+                    : 'assets/images/ruta_1.png'),
                 width: 100,
                 height: 80,
               ),
               const SizedBox(
                 width: 20,
               ),
-              Material(
-                color: Colors.transparent,
-                child: Column(
-                  children: [
-                    const Text(
-                      'Dirección:',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.left,
-                    ),
-                    Text(
-                      widget.nameRoute,
-                      style: const TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Text(
-                      'Tiempo estimado al destino:',
-                      style: TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 2,
-                    ),
-                    const Row(
-                      children: [
-                        Icon(
-                          Icons.timer,
-                          size: 12.0,
-                          color: Colors.black,
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        routeShortName,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(
-                          width: 2,
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      const Text(
+                        'Dirección:',
+                        style: TextStyle(
+                          fontSize: 13.0,
+                          fontWeight: FontWeight.bold,
                         ),
-                        Text(
-                          '50 minutos',
-                          style: TextStyle(
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      Text(
+                        routeLongName,
+                        maxLines: 2,
+                        style: const TextStyle(
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

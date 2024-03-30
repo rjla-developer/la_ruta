@@ -139,6 +139,7 @@ void getOptionsRoutes(controlsMapProvider, gtfsProvider) async {
               routeShortName: element.routeShortName,
               routeLongName: element.routeLongName,
               routeType: element.routeType,
+              colorRoute: element.colorRoute,
             );
             possibleRoutesToDestination.add(routeToDestination);
           });
@@ -148,6 +149,6 @@ void getOptionsRoutes(controlsMapProvider, gtfsProvider) async {
     controlsMapProvider.possibleRoutesToDestination =
         possibleRoutesToDestination;
     /* print(
-          'controlsMapProvider.possibleRoutesToDestination ${controlsMapProvider.possibleRoutesToDestination}'); */
+        'controlsMapProvider.possibleRoutesToDestination ${controlsMapProvider.possibleRoutesToDestination}'); */
   }
 }

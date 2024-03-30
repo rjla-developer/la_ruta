@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+//FlutterMap:
+import 'package:flutter_map/flutter_map.dart';
+
 //Latlong2:
 import 'package:latlong2/latlong.dart';
 
@@ -19,14 +22,14 @@ class ControlsMapProvider extends ChangeNotifier {
   LatLng? _userPosition;
   LatLng? _targetPosition;
   final PanelController _panelController = PanelController();
-  final List<LatLng> _route = [];
+  Polyline _dataPolylineRoute = Polyline(points: []);
   final List<PossibleRouteToDestinationModel> _possibleRoutesToDestination = [];
 
 //Getters:
   LatLng? get userPosition => _userPosition;
   LatLng? get targetPosition => _targetPosition;
   PanelController get panelController => _panelController;
-  List<LatLng> get route => _route;
+  Polyline get dataPolylineRoute => _dataPolylineRoute;
   List<PossibleRouteToDestinationModel> get possibleRoutesToDestination =>
       _possibleRoutesToDestination;
 
@@ -70,9 +73,8 @@ class ControlsMapProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  set route(List<LatLng> value) {
-    _route.clear();
-    _route.addAll(value);
+  set dataPolylineRoute(Polyline value) {
+    _dataPolylineRoute = value;
     notifyListeners();
   }
 

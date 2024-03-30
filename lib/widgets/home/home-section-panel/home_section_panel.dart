@@ -60,10 +60,7 @@ class _HomeSectionPanelState extends State<HomeSectionPanel> {
                 ...possibleRoutesToDestination
                     .expand((possibleRouteToDestination) {
                   return [
-                    ItemOptionRoute(
-                      nameRoute: possibleRouteToDestination.routeShortName,
-                      value: possibleRouteToDestination.coordinates,
-                    ),
+                    ItemOptionRoute(data: possibleRouteToDestination),
                     const SizedBox(
                       height: 20,
                     ),

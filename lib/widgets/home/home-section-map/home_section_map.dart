@@ -52,11 +52,7 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
         ),
         PolylineLayer(
           polylines: [
-            Polyline(
-              strokeWidth: 4.0,
-              points: controlsMapProvider.route,
-              color: Colors.green,
-            ),
+            controlsMapProvider.dataPolylineRoute,
           ],
         ),
         AnimatedMarkerLayer(
