@@ -12,20 +12,23 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 //Dart:
 import 'dart:async';
 
+//Models:
+import 'package:la_ruta/models/possible_route_to_destination_model.dart';
+
 class ControlsMapProvider extends ChangeNotifier {
   LatLng? _userPosition;
   LatLng? _targetPosition;
   final PanelController _panelController = PanelController();
   final List<LatLng> _route = [];
-  final Map<String, List<LatLng>> _posiblesRoutesToDestination = {};
+  final List<PossibleRouteToDestinationModel> _possibleRoutesToDestination = [];
 
 //Getters:
   LatLng? get userPosition => _userPosition;
   LatLng? get targetPosition => _targetPosition;
   PanelController get panelController => _panelController;
   List<LatLng> get route => _route;
-  Map<String, List<LatLng>> get posiblesRoutesToDestination =>
-      _posiblesRoutesToDestination;
+  List<PossibleRouteToDestinationModel> get possibleRoutesToDestination =>
+      _possibleRoutesToDestination;
 
 //Setters:
   Future<void> _setUserPosition() async {
@@ -73,9 +76,9 @@ class ControlsMapProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  set posiblesRoutesToDestination(Map<String, List<LatLng>> value) {
-    _posiblesRoutesToDestination.clear();
-    _posiblesRoutesToDestination.addAll(value);
+  set possibleRoutesToDestination(List<PossibleRouteToDestinationModel> value) {
+    possibleRoutesToDestination.clear();
+    possibleRoutesToDestination.addAll(value);
     notifyListeners();
   }
 

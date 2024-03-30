@@ -7,6 +7,7 @@ import 'dart:math';
 
 //Http:
 import 'package:http/http.dart' as http;
+import 'package:la_ruta/models/possible_route_to_destination_model.dart';
 
 //Latlong2:
 import 'package:latlong2/latlong.dart';
@@ -26,6 +27,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:la_ruta/models/stop_model.dart';
 import 'package:la_ruta/models/bus_stop_model.dart';
 import 'package:la_ruta/models/shape_model.dart';
+import 'package:la_ruta/models/route_model.dart';
 
 const searchLocationAccessToken =
     "pk.eyJ1IjoicmotZGV2ZWxvcGVyIiwiYSI6ImNsa3JpOXNudDB2dG8zcXFtN3RqYzk2ZngifQ.OjfZuB4ku290h-qvB-BecA";
@@ -137,6 +139,7 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
     double closestRouteDistance = double.infinity;
 
     List<StopModel> stopsInfo = gtfsProvider.dataGTFS!.stopsInfo;
+    List<RouteModel> routesInfo = gtfsProvider.dataGTFS!.routesInfo;
 
     for (int i = 0; i < stopsInfo.length; i++) {
       var fieldCoordinates = LatLng(stopsInfo[i].stopLat, stopsInfo[i].stopLon);
@@ -175,7 +178,8 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
 
       //Determinar microbuses directos al destino:
       List<ShapeModel> shapesInfo = gtfsProvider.dataGTFS!.shapesInfo;
-      Map<double, List<LatLng>> routeToDestination = {};
+      final List<PossibleRouteToDestinationModel> possibleRoutesToDestination =
+          [];
 
       /* Esta lógica une a los microbuses con el 'routeId' identicos que 
       tienen paradas cercanas al origen y al destino del usuario. */
@@ -198,30 +202,43 @@ class _HomeSectionSearchState extends State<HomeSectionSearch> {
                 LatLng(stopFromOrigin.stopLat, stopFromOrigin.stopLon);
             LatLng coordinatesBusWithClosestStopFromDestination = LatLng(
                 stopFromDestination.stopLat, stopFromDestination.stopLon);
+            List<LatLng> coordinates = [
+              coordinatesBusWithClosestStopFromOrigin,
+            ];
 
-            /* putIfAbsent es un método que toma dos argumentos: una clave y una función que genera un valor. */
-            routeToDestination.putIfAbsent(busFromOrigin.routeId,
-                () => [coordinatesBusWithClosestStopFromOrigin]);
-
+            //En está parte del código se buscan las coordenas de Shapes que estén entre las paradas más cercanas al origen y al destino del usuario.
             for (var shape in shapesInfo) {
               if (shape.shapeId == busFromOrigin.routeId &&
                   busFromDestination.stopSequence > shape.stopSequence &&
                   shape.stopSequence > busFromOrigin.stopSequence) {
                 LatLng shapeCoordinates =
                     LatLng(shape.shapePtLat, shape.shapePtLon);
-                routeToDestination[busFromOrigin.routeId]
-                    ?.add(shapeCoordinates);
+                coordinates.add(shapeCoordinates);
               }
             }
 
-            routeToDestination[busFromOrigin.routeId]
-                ?.add(coordinatesBusWithClosestStopFromDestination);
+            coordinates.add(coordinatesBusWithClosestStopFromDestination);
+
+            routesInfo
+                .where((element) => element.routeId == busFromOrigin.routeId)
+                .forEach((element) {
+              PossibleRouteToDestinationModel routeToDestination =
+                  PossibleRouteToDestinationModel(
+                routeId: busFromOrigin.routeId,
+                coordinates: coordinates,
+                routeShortName: element.routeShortName,
+                routeLongName: element.routeLongName,
+                routeType: element.routeType,
+              );
+              possibleRoutesToDestination.add(routeToDestination);
+            });
           }
         }
       }
-
-      controlsMapProvider.posiblesRoutesToDestination = routeToDestination
-          .map((key, value) => MapEntry(key.toString(), value));
+      controlsMapProvider.possibleRoutesToDestination =
+          possibleRoutesToDestination;
+      /* print(
+          'controlsMapProvider.possibleRoutesToDestination ${controlsMapProvider.possibleRoutesToDestination}'); */
     }
   }
 
