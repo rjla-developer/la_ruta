@@ -5,13 +5,11 @@ import "package:provider/provider.dart";
 
 //Providers:
 import "package:la_ruta/providers/controls_map_provider.dart";
-import "package:la_ruta/providers/gtfs_provider.dart";
 
 //Widgets:
 import "package:la_ruta/widgets/home/home-section-panel/item_option_route.dart";
 
 //Models:
-import "package:la_ruta/models/route_model.dart";
 import "package:la_ruta/models/possible_route_to_destination_model.dart";
 
 class HomeSectionPanel extends StatefulWidget {
@@ -61,8 +59,6 @@ class _HomeSectionPanelState extends State<HomeSectionPanel> {
               children: [
                 ...possibleRoutesToDestination
                     .expand((possibleRouteToDestination) {
-                  print(
-                      'possibleRouteToDestination: $possibleRouteToDestination');
                   return [
                     ItemOptionRoute(
                       nameRoute: possibleRouteToDestination.routeShortName,
@@ -72,7 +68,7 @@ class _HomeSectionPanelState extends State<HomeSectionPanel> {
                       height: 20,
                     ),
                   ];
-                }).toList(),
+                }),
               ],
             ),
           ),
