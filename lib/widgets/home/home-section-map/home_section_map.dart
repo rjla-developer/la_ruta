@@ -100,16 +100,16 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
           ],
         ),
         /* AnimatedMarker(
-                        point: const LatLng(18.940714, -99.241622),
-                        builder: (_, animation) {
-                          final size = 50.0 * animation.value;
-                          return Icon(
-                            Icons.directions_bus,
-                            size: size,
-                            color: const Color.fromARGB(255, 189, 39, 194),
-                          );
-                        },
-                      ), */
+            point: const LatLng(18.940714, -99.241622),
+            builder: (_, animation) {
+              final size = 50.0 * animation.value;
+              return Icon(
+                Icons.directions_bus,
+                size: size,
+                color: const Color.fromARGB(255, 189, 39, 194),
+              );
+            },
+          ), */
       ],
     );
   }

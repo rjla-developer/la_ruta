@@ -76,6 +76,7 @@ void getOptionsRoutes(controlsMapProvider, gtfsProvider) async {
   // Si no hay rutas cerca del destino del usuario, informa al usuario
   if (closestRouteDistance > limitDistance) {
     print('No hay rutas cerca de tu destino.');
+    controlsMapProvider.possibleRoutesToDestination.clear();
   } else {
     List<BusStopModel> busStopsInfo = gtfsProvider.dataGTFS!.busStopsInfo;
     List<BusStopModel> busesWithClosestStopFromOrigin = busStopsInfo

@@ -53,22 +53,54 @@ class _HomeSectionPanelState extends State<HomeSectionPanel> {
           const SizedBox(
             height: 20,
           ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(left: 10, right: 10),
-              children: [
-                ...possibleRoutesToDestination
-                    .expand((possibleRouteToDestination) {
-                  return [
-                    ItemOptionRoute(data: possibleRouteToDestination),
-                    const SizedBox(
+          if (possibleRoutesToDestination.isEmpty)
+            const Expanded(
+              child: Material(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    SizedBox(
                       height: 20,
                     ),
-                  ];
-                }),
-              ],
+                    Icon(
+                      Icons.bus_alert,
+                      color: Colors.red,
+                      size: 50,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Center(
+                      child: Text(
+                        "No hay rutas disponibles",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            )
+          else
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                children: [
+                  ...possibleRoutesToDestination
+                      .expand((possibleRouteToDestination) {
+                    return [
+                      ItemOptionRoute(data: possibleRouteToDestination),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                    ];
+                  }),
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );
