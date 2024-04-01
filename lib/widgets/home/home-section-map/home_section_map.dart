@@ -50,6 +50,11 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
             'accessToken': mapboxAccessToken,
           },
         ),
+        PolylineLayer(
+          polylines: [
+            controlsMapProvider.dataPolylineRoute,
+          ],
+        ),
         AnimatedMarkerLayer(
           markers: [
             AnimatedMarker(
@@ -95,25 +100,16 @@ class _HomeSectionMapState extends State<HomeSectionMap> {
           ],
         ),
         /* AnimatedMarker(
-                        point: const LatLng(18.940714, -99.241622),
-                        builder: (_, animation) {
-                          final size = 50.0 * animation.value;
-                          return Icon(
-                            Icons.directions_bus,
-                            size: size,
-                            color: const Color.fromARGB(255, 189, 39, 194),
-                          );
-                        },
-                      ), */
-        PolylineLayer(
-          polylines: [
-            Polyline(
-              strokeWidth: 4.0,
-              points: controlsMapProvider.route,
-              color: Colors.green,
-            ),
-          ],
-        ),
+            point: const LatLng(18.940714, -99.241622),
+            builder: (_, animation) {
+              final size = 50.0 * animation.value;
+              return Icon(
+                Icons.directions_bus,
+                size: size,
+                color: const Color.fromARGB(255, 189, 39, 194),
+              );
+            },
+          ), */
       ],
     );
   }

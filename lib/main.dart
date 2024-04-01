@@ -8,7 +8,6 @@ import 'package:la_ruta/providers/controls_map_provider.dart';
 import 'package:la_ruta/providers/gtfs_provider.dart';
 
 //Screens:
-import 'screens/home.dart';
 import 'screens/splash.dart';
 
 void main() {

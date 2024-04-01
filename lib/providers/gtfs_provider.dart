@@ -6,19 +6,26 @@ import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'dart:async';
 
+//Models:
+import 'package:la_ruta/models/stop_model.dart';
+import 'package:la_ruta/models/bus_stop_model.dart';
+import 'package:la_ruta/models/shape_model.dart';
+import 'package:la_ruta/models/route_model.dart';
+import 'package:la_ruta/models/trip_model.dart';
+
 class GTFS {
-  final List<Stop> _stopsInfo;
-  final List<BusStop> _busStopsInfo;
-  final List<Shape> _shapesInfo;
-  final List<Route> _routesInfo;
-  final List<Trip> _tripsInfo;
+  final List<StopModel> _stopsInfo;
+  final List<BusStopModel> _busStopsInfo;
+  final List<ShapeModel> _shapesInfo;
+  final List<RouteModel> _routesInfo;
+  final List<TripModel> _tripsInfo;
 
   GTFS(
-      {required List<Stop> stopsInfo,
-      required List<BusStop> busStopsInfo,
-      required List<Shape> shapesInfo,
-      required List<Route> routesInfo,
-      required List<Trip> tripsInfo})
+      {required List<StopModel> stopsInfo,
+      required List<BusStopModel> busStopsInfo,
+      required List<ShapeModel> shapesInfo,
+      required List<RouteModel> routesInfo,
+      required List<TripModel> tripsInfo})
       : assert(
             stopsInfo.isNotEmpty, 'La lista de paradas no puede estar vacía.'),
         assert(busStopsInfo.isNotEmpty,
@@ -35,153 +42,15 @@ class GTFS {
         _routesInfo = routesInfo,
         _tripsInfo = tripsInfo;
 
-  List<Stop> get stopsInfo => _stopsInfo;
-  List<BusStop> get busStopsInfo => _busStopsInfo;
-  List<Shape> get shapesInfo => _shapesInfo;
-  List<Route> get routesInfo => _routesInfo;
-  List<Trip> get tripsInfo => _tripsInfo;
+  List<StopModel> get stopsInfo => _stopsInfo;
+  List<BusStopModel> get busStopsInfo => _busStopsInfo;
+  List<ShapeModel> get shapesInfo => _shapesInfo;
+  List<RouteModel> get routesInfo => _routesInfo;
+  List<TripModel> get tripsInfo => _tripsInfo;
 
   @override
   String toString() {
     return 'GTFS(stopsInfo: $_stopsInfo, busStopsInfo: $_busStopsInfo, shapesInfo: $_shapesInfo, routesInfo: $_routesInfo, tripsInfo: $_tripsInfo)';
-  }
-}
-
-class Stop {
-  final int stopId;
-  final String stopName;
-  final double stopLat;
-  final double stopLon;
-
-  Stop(
-      {required this.stopId,
-      required this.stopName,
-      required this.stopLat,
-      required this.stopLon});
-
-  factory Stop.fromList(List<String> data) {
-    return Stop(
-      stopId: int.parse(data[0]),
-      stopName: data[1],
-      stopLat: double.parse(data[2]),
-      stopLon: double.parse(data[3]),
-    );
-  }
-
-  @override
-  String toString() {
-    return 'Stop(stopId: $stopId, stopName: $stopName, stopLat: $stopLat, stopLon: $stopLon)';
-  }
-}
-
-class BusStop {
-  final double routeId;
-  final int stopId;
-  final int stopSequence;
-
-  BusStop(
-      {required this.routeId,
-      required this.stopId,
-      required this.stopSequence});
-
-  factory BusStop.fromList(List<String> data) {
-    return BusStop(
-      routeId: double.parse(data[0]),
-      stopId: int.parse(data[1]),
-      stopSequence: int.parse(data[2]),
-    );
-  }
-
-  @override
-  String toString() {
-    return 'BusStop(routeId: $routeId, stopId: $stopId, stopSequence: $stopSequence)';
-  }
-}
-
-class Shape {
-  final double shapeId;
-  final double shapePtLat;
-  final double shapePtLon;
-  final int shapePtSequence;
-  final int stopSequence;
-
-  Shape(
-      {required this.shapeId,
-      required this.shapePtLat,
-      required this.shapePtLon,
-      required this.shapePtSequence,
-      required this.stopSequence});
-
-  factory Shape.fromList(List<String> data) {
-    return Shape(
-      shapeId: double.parse(data[0]),
-      shapePtLat: double.parse(data[1]),
-      shapePtLon: double.parse(data[2]),
-      shapePtSequence: int.parse(data[3]),
-      stopSequence: int.parse(data[4]),
-    );
-  }
-
-  @override
-  String toString() {
-    return 'Shape(shapeId: $shapeId, shapePtLat: $shapePtLat, shapePtLon: $shapePtLon, shapePtSequence: $shapePtSequence, stopSequence: $stopSequence)';
-  }
-}
-
-class Route {
-  final double routeId;
-  final String agencyId;
-  final String routeShortName;
-  final String routeLongName;
-  final String routeType;
-
-  Route(
-      {required this.routeId,
-      required this.agencyId,
-      required this.routeShortName,
-      required this.routeLongName,
-      required this.routeType});
-
-  factory Route.fromList(List<String> data) {
-    return Route(
-      routeId: double.parse(data[0]),
-      agencyId: data[1],
-      routeShortName: data[2],
-      routeLongName: data[3],
-      routeType: data[4],
-    );
-  }
-
-  @override
-  String toString() {
-    return 'Route(routeId: $routeId, agencyId: $agencyId, routeShortName: $routeShortName, routeLongName: $routeLongName, routeType: $routeType)';
-  }
-}
-
-class Trip {
-  final String tripId;
-  final double routeId;
-  final String serviceId;
-  final double shapeId;
-
-  Trip(
-      {required this.tripId,
-      required this.routeId,
-      required this.serviceId,
-      required this.shapeId});
-
-  factory Trip.fromList(List<String> data) {
-    return Trip(
-      tripId: data[0],
-      routeId: double.parse(data[1]),
-      serviceId: data[2],
-      shapeId: double.parse(data[3]),
-    );
-  }
-
-  @override
-  String toString() {
-    return 'Trip(tripId: $tripId, routeId: $routeId, serviceId: $serviceId, shapeId: $shapeId)';
   }
 }
 
@@ -222,20 +91,20 @@ class GTFSProvider extends ChangeNotifier {
     final archive = ZipDecoder().decodeBytes(bytes);
 
     final stopsInfo = (await processFile(archive, 'ruta3_ahuatlan/stops.txt'))
-        .map((e) => Stop.fromList(e))
+        .map((e) => StopModel.fromList(e))
         .toList(); //Toda esta linea trata sobre crear una instancia de la clase correspondiente y devolverlo como una lista .
     final busStopsInfo =
         (await processFile(archive, 'ruta3_ahuatlan/bus_stops.txt'))
-            .map((e) => BusStop.fromList(e))
+            .map((e) => BusStopModel.fromList(e))
             .toList();
     final shapesInfo = (await processFile(archive, 'ruta3_ahuatlan/shapes.txt'))
-        .map((e) => Shape.fromList(e))
+        .map((e) => ShapeModel.fromList(e))
         .toList();
     final routesInfo = (await processFile(archive, 'ruta3_ahuatlan/routes.txt'))
-        .map((e) => Route.fromList(e))
+        .map((e) => RouteModel.fromList(e))
         .toList();
     final tripsInfo = (await processFile(archive, 'ruta3_ahuatlan/trips.txt'))
-        .map((e) => Trip.fromList(e))
+        .map((e) => TripModel.fromList(e))
         .toList();
 
     if (stopsInfo.isEmpty ||

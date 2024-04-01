@@ -9,12 +9,22 @@ import "package:la_ruta/providers/controls_map_provider.dart";
 //Widgets:
 import "package:la_ruta/widgets/home/home-section-panel/item_option_route.dart";
 
-class HomeSectionPanel extends StatelessWidget {
+//Models:
+import "package:la_ruta/models/possible_route_to_destination_model.dart";
+
+class HomeSectionPanel extends StatefulWidget {
   const HomeSectionPanel({super.key});
 
   @override
+  State<HomeSectionPanel> createState() => _HomeSectionPanelState();
+}
+
+class _HomeSectionPanelState extends State<HomeSectionPanel> {
+  @override
   Widget build(BuildContext context) {
     final controlsMapProvider = context.watch<ControlsMapProvider>();
+    final List<PossibleRouteToDestinationModel> possibleRoutesToDestination =
+        controlsMapProvider.possibleRoutesToDestination;
     return Container(
       decoration: const BoxDecoration(
         color: Color.fromARGB(255, 255, 255, 255),
@@ -43,24 +53,54 @@ class HomeSectionPanel extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(left: 10, right: 10),
-              children: [
-                ...controlsMapProvider.posiblesRoutesToDestination.entries
-                    .expand((entry) {
-                  String nameRoute = entry.key;
-                  var value = entry.value;
-                  return [
-                    ItemOptionRoute(nameRoute: nameRoute, value: value),
-                    const SizedBox(
+          if (possibleRoutesToDestination.isEmpty)
+            const Expanded(
+              child: Material(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    SizedBox(
                       height: 20,
                     ),
-                  ];
-                }).toList(),
-              ],
+                    Icon(
+                      Icons.bus_alert,
+                      color: Colors.red,
+                      size: 50,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Center(
+                      child: Text(
+                        "No hay rutas disponibles",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            )
+          else
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                children: [
+                  ...possibleRoutesToDestination
+                      .expand((possibleRouteToDestination) {
+                    return [
+                      ItemOptionRoute(data: possibleRouteToDestination),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                    ];
+                  }),
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );

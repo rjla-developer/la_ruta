@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -18,7 +19,8 @@ String getCoords(List<LatLng> route) {
       .join(';');
 }
 
-Future<List<LatLng>> getRoute(BuildContext context, List<LatLng> route) async {
+Future<List<LatLng>> getRoute(
+    BuildContext context, List<LatLng> route, Color colorRoute) async {
   final controlsMapProvider =
       Provider.of<ControlsMapProvider>(context, listen: false);
   final response = await http.get(Uri.parse(
@@ -29,7 +31,13 @@ Future<List<LatLng>> getRoute(BuildContext context, List<LatLng> route) async {
     final List<LatLng> points =
         geometry.map<LatLng>((coord) => LatLng(coord[1], coord[0])).toList();
 
-    controlsMapProvider.route = points;
+    final Polyline dataPolylineRoute = Polyline(
+      strokeWidth: 4.0,
+      points: points,
+      color: colorRoute,
+    );
+    controlsMapProvider.dataPolylineRoute = dataPolylineRoute;
+
     return points;
   } else {
     throw Exception('Failed to load _route');
